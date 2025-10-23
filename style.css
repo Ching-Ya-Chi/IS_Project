@@ -1,4 +1,3 @@
-
 input[type="time"]::-webkit-datetime-edit-ampm-field {
     display: none;
 }
@@ -71,7 +70,6 @@ body {
 }
 
 /* ****** 頁面內容容器的通用樣式 ****** */
-/* 這些樣式將應用於動態載入到 #main-content-area 內的根元素 */
 #main-content-area {
     width: 100%;
     height: 100%;
@@ -82,31 +80,46 @@ body {
     overflow: hidden; /* 防止內容溢出 */
 }
 
-/* ****** 彈出視窗的通用樣式 ****** */
-/* 這裡的 .page 樣式現在只針對彈出視窗 */
-.page.tea-garden-selection-page {
-    width: 90%; /* 相對寬度 */
-    max-width: 330px; /* 最大寬度 */
-    height: 80%; /* 相對高度 */
-    max-height: 550px; /* 最大高度 */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* 居中 */
-    border-radius: 15px; /* 圓角 */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 浮動陰影 */
-    z-index: 60; /* 介於 overlay 和 dynamic-island 之間 */
-    padding: 0; /* 內部內容自己控制 padding */
-    overflow: hidden; /* 確保內容在圓角內 */
-    position: absolute; /* 讓頁面堆疊，而不是擠壓 */
-    background-color: #ffffff; /* 確保頁面有背景色覆蓋下方內容 */
+/* ****** 彈出視窗的通用樣式 (針對所有 .page) ****** */
+/* 這裡的 .page 樣式只針對彈出視窗 */
+.page {
+    position: absolute;
     display: none; /* 預設隱藏 */
     flex-direction: column;
     box-sizing: border-box;
+    background-color: #ffffff;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 15px; /* 彈出視窗的圓角 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
-.page.tea-garden-selection-page.active {
+.page.active {
     display: flex; /* 顯示活躍的彈出視窗 */
 }
 
+/* ****** 茶園選擇彈出視窗 (Popup Window) ****** */
+.page.tea-garden-selection-page {
+    width: 90%;
+    max-width: 330px;
+    height: 80%;
+    max-height: 550px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 60; /* 介於 overlay 和 dynamic-island 之間 */
+}
+
+/* ****** 好友專注設定彈出視窗 (新加入的彈出視窗) ****** */
+.page.friend-focus-settings-page {
+    width: 80%; /* 比茶園選擇彈出視窗略小 */
+    max-width: 300px;
+    height: auto; /* 高度自適應內容 */
+    min-height: 250px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 70; /* 比茶園選擇彈出視窗高，浮在其之上 */
+}
 
 /* ---------------------------------------------------- */
 /* ****** 主頁面樣式 (main-page-container) ****** */
@@ -761,7 +774,7 @@ body {
 }
 
 /* ---------------------------------------------------- */
-/* ****** 茶園選擇彈出視窗樣式 (Popup Window) ****** */
+/* ****** 茶園選擇彈出視窗樣式 (Popup Window) - 基礎樣式已在 .page 中定義 ****** */
 .selection-header {
     height: 80px;
     background-color: #E0E0E0;
@@ -774,8 +787,8 @@ body {
     border-top-left-radius: 15px; /* 與彈出視窗自身的圓角對齊 */
     border-top-right-radius: 15px;
 }
-/* 彈出視窗的返回按鈕 */
-.tea-garden-selection-page .back-button {
+/* 彈出視窗的返回按鈕 (通用) */
+.page .back-button { /* 調整為 .page 下的 back-button */
     position: absolute;
     left: 20px;
     font-size: 24px;
@@ -807,34 +820,11 @@ body {
     border-bottom-right-radius: 15px;
     overflow-y: auto;
 }
-.mini-map-block {
-    width: calc(100% - 40px);
-    height: 150px;
-    background-color: #4CAF50;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    position: relative;
-    color: white;
-    font-size: 1.2em;
-}
-.mini-tea-garden-circle {
-    width: 80px;
-    height: 80px;
-    background-color: #cccccc;
-    border-radius: 50%;
-    position: absolute;
-    left: 50%;
-    bottom: -40px; /* 半圓形在下方突出 */
-    transform: translateX(-50%);
-}
+/* 茶種圓圈 (移除計時器相關樣式) */
 .tea-type-circle {
     width: 180px;
     height: 180px;
-    background-color: #E0E0E0; /* 圓圈計時器清空時的底色 */
+    background-color: #90EE90; /* 靜態綠色背景 */
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -843,30 +833,26 @@ body {
     font-weight: bold;
     color: #333;
     margin-top: 20px;
-    position: relative; /* 確保文本 z-index 有效 */
-    overflow: hidden; /* 隱藏超出圓圈的內容，確保 conic-gradient 效果 */
-    /* 使用 conic-gradient 模擬進度條效果 */
-    /* --timer-progress 是一個 CSS 變數，可以透過 JavaScript 來更新，例如從 100% 減到 0% */
-    background: conic-gradient(#90EE90 0% var(--timer-progress, 100%), #E0E0E0 var(--timer-progress, 100%) 100%);
-    transition: background 0.1s linear; /* 平滑過渡效果 */
+    position: relative;
+    overflow: hidden;
+    /* 移除 conic-gradient 和 transition */
 }
-/* 新增用於顯示倒數計時的文本樣式 */
+/* 倒數計時文本 (現在只顯示靜態文字) */
 .tea-type-circle .countdown-text {
-    font-size: 1.5em; /* 與圓圈原有的字體大小一致 */
+    font-size: 1.5em;
     font-weight: bold;
     color: #333;
     position: relative;
-    z-index: 2; /* 確保在進度條上方 */
+    z-index: 2;
 }
 
 .focus-time-display {
     font-size: 1.2em;
     color: #333;
     margin-top: 15px;
-    display: flex; /* 讓文字和輸入框保持一行 */
-    align-items: center; /* 垂直居中對齊 */
+    display: flex;
+    align-items: center;
 }
-/* 針對新的時間輸入框添加樣式 */
 .focus-time-display .time-input {
     padding: 8px 12px;
     border: 1px solid #ccc;
@@ -874,22 +860,18 @@ body {
     font-size: 1em;
     color: #333;
     text-align: center;
-    margin-left: 10px; /* 與文字的間距 */
-    width: 120px; /* 固定寬度 */
-    -webkit-appearance: none; /* 移除某些瀏覽器預設樣式 */
+    margin-left: 10px;
+    width: 120px;
+    -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    /* 隱藏時間選擇圖示 */
-    /* 注意：這會移除時間選擇器功能，用戶需要手動輸入時間 */
     &::-webkit-calendar-picker-indicator {
         display: none;
     }
-    /* Firefox */
     &::-moz-time-picker-indicator {
         display: none;
     }
-    /* Edge */
-    &::-ms-clear { /* for IE/Edge clear button */
+    &::-ms-clear {
         display: none;
     }
 }
@@ -916,4 +898,246 @@ body {
 }
 .action-button:hover {
     background-color: #d0d0d0;
+}
+
+/* ****** 好友專注設定頁面內容樣式 (friend-focus-settings-page-container) ****** */
+/* 注意：這個類名對應到 pages/friend_focus_settings.html 的根 div */
+.friend-focus-settings-page-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.friend-focus-settings-page-container .settings-header {
+    height: 80px;
+    background-color: #E0E0E0;
+    padding: 0 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+.friend-focus-settings-page-container .settings-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 40px;
+}
+.friend-focus-settings-page-container .settings-content {
+    flex-grow: 1;
+    background-color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; /* 確保按鈕在底部 */
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+.friend-count-setting {
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    color: #333;
+    margin-top: 30px;
+    white-space: nowrap; /* 防止換行 */
+}
+.friend-limit-input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #333;
+    text-align: center;
+    margin: 0 10px;
+    width: 60px; /* 調整寬度 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+/* 隱藏數字輸入框的上下箭頭 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+.confirm-friend-focus {
+    width: calc(100% - 40px);
+    padding: 15px;
+    background-color: #D4B886; /* 不同顏色強調 */
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer;
+    margin-top: auto; /* 推到底部 */
+}
+.confirm-friend-focus:hover {
+    background-color: #c0a87a;
+}
+
+/* ****** 專注會話頁面樣式 (focus-session-page-container) ****** */
+.focus-session-page-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #FFF0F5; /* 圖片中的粉色背景 */
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    box-sizing: border-box;
+}
+
+.video-placeholder {
+    width: 90%;
+    height: 200px; /* 影片預留空間 */
+    background-color: #E0E0E0; /* 淺灰色背景，作為影片的佔位符 */
+    border-radius: 10px;
+    display: flex; /* 保留 flex 居中文字功能，如果未來有影片會被覆蓋 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #555;
+    font-size: 1em;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+}
+.video-placeholder p { /* 隱藏文字 */
+    display: none;
+}
+
+
+.character-group {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 20px;
+    gap: 10px;
+}
+.character-group .character-container {
+    width: 80px; /* 調整大小以適應三個並排 */
+    height: 80px;
+    margin: 0; /* 移除額外 margin */
+}
+.character-group .plant-sprite {
+    background-color: transparent; /* 移除綠色背景，讓圖片為主 */
+}
+.character-group .plant-sprite img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 確保圖片完全顯示 */
+    border-radius: 0; /* 移除圓角 */
+}
+
+.focus-countdown {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    background-color: #f0f0f0;
+    padding: 10px 20px;
+    border-radius: 20px;
+    margin-top: 30px;
+}
+
+.stop-button {
+    width: 60%;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+}
+.stop-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* ****** 專注完成彈出視窗樣式 (focus-completion-page) ****** */
+.page.focus-completion-page {
+    width: 90%;
+    max-width: 330px;
+    height: 80%;
+    max-height: 550px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 80; /* 比其他彈出視窗更高 */
+    padding: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.focus-completion-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around; /* 使內容垂直分佈 */
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.completion-message {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #333;
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+.tea-image-placeholder {
+    width: 150px;
+    height: 150px;
+    background-color: #E0E0E0; /* 灰色背景作為圖片佔位符 */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #555;
+    font-size: 0.9em;
+    margin: 30px 0;
+}
+
+.completion-time-display {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.return-to-main-button {
+    width: 70%;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+}
+.return-to-main-button:hover {
+    background-color: #e0e0e0;
 }

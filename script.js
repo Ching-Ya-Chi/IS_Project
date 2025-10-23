@@ -1,14 +1,93 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const mainContentArea = document.getElementById('main-content-area');
     const popupOverlay = document.getElementById('popup-overlay');
     const teaGardenSelectionPopupPage = document.getElementById('tea-garden-selection-popup-page');
+    const friendFocusSettingsPopupPage = document.getElementById('friend-focus-settings-popup-page');
+    const focusCompletionPopupPage = document.getElementById('focus-completion-popup-page'); // 新的專注完成彈出視窗
 
     let pageHistory = []; // 儲存頁面路徑的歷史記錄
 
+    // ****** 計時器相關變數和函數 ******
+    let focusTimerInterval = null;
+    let focusTotalSeconds = 0;
+    let focusRemainingSeconds = 0;
+    let selectedGardenName = '金城茶園'; // 假設茶園名稱，未來可動態獲取
+    let selectedTeaType = '包種茶'; // 假設茶種，未來可動態獲取
+
+    function parseTimeToSeconds(timeString) {
+        const parts = timeString.split(':');
+        if (parts.length === 2) {
+            const hours = parseInt(parts[0], 10);
+            const minutes = parseInt(parts[1], 10);
+            return (hours * 3600) + (minutes * 60);
+        }
+        return 0;
+    }
+
+    function formatSecondsToDisplay(seconds) {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function formatSecondsToMinutesSeconds(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    // 更新專注頁面上的倒計時顯示
+    function updateFocusDisplay() {
+        const remainingTimeDisplay = mainContentArea.querySelector('#remaining-time-display');
+        if (!remainingTimeDisplay) { // 如果不在專注頁面，則停止計時
+            endFocusSession(false); // 強制停止計時器
+            return;
+        }
+
+        if (focusRemainingSeconds <= 0) {
+            endFocusSession(true); // 完成專注
+            return;
+        }
+
+        remainingTimeDisplay.textContent = formatSecondsToDisplay(focusRemainingSeconds);
+        focusRemainingSeconds--;
+    }
+
+    // 啟動專注計時器
+    function startFocusCountdown() {
+        if (focusTimerInterval) {
+            clearInterval(focusTimerInterval);
+        }
+        focusTimerInterval = setInterval(updateFocusDisplay, 1000);
+    }
+
+    // 結束專注會話
+    function endFocusSession(completed) {
+        if (focusTimerInterval) {
+            clearInterval(focusTimerInterval);
+            focusTimerInterval = null;
+        }
+        if (completed) {
+            // alert('恭喜你，專注時間結束！'); // 改為顯示彈出視窗
+            showFocusCompletionPopup(focusTotalSeconds);
+        } else {
+            alert('專注會話已中途終止。');
+            loadPage('main', false); // 中途終止直接回主頁
+        }
+    }
+    // ****** 計時器相關變數和函數結束 ******
+
+
     // 輔助函數：動態載入頁面內容並注入到主內容區
     async function loadPage(pageName, addToHistory = true) {
-        // 如果彈出視窗打開著，先關閉它
+        // 如果有任何彈出視窗打開著，先關閉它
+        if (focusCompletionPopupPage.classList.contains('active')) {
+            hideFocusCompletionPopup();
+        }
+        if (friendFocusSettingsPopupPage.classList.contains('active')) {
+            hideFriendFocusSettingsPopup();
+        }
         if (teaGardenSelectionPopupPage.classList.contains('active')) {
             hideTeaGardenSelectionPopup();
         }
@@ -31,6 +110,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // 重新綁定新載入內容中的事件監聽器
             attachEventListenersToLoadedContent();
 
+            // 如果是專注會話頁面，則啟動計時器
+            if (pageName === 'focus_session' && focusTotalSeconds > 0) {
+                const remainingTimeDisplay = mainContentArea.querySelector('#remaining-time-display');
+                if (remainingTimeDisplay) {
+                    remainingTimeDisplay.textContent = formatSecondsToDisplay(focusRemainingSeconds);
+                }
+                startFocusCountdown();
+            }
+
+
         } catch (error) {
             console.error('載入頁面失敗:', error);
             mainContentArea.innerHTML = `<div style="padding: 20px; text-align: center; color: red;">載入 ${pageName} 頁面失敗。</div>`;
@@ -39,158 +128,201 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 輔助函數：顯示茶園選擇彈出視窗
     function showTeaGardenSelectionPopup() {
-        // 確保地圖頁面在背景是活躍的（此處可以根據實際需求判斷）
-        // 如果不是從地圖頁面點擊，可以考慮自動載入地圖頁面
-        // if (pageHistory[pageHistory.length - 1] !== 'map') {
-        //     loadPage('map', true);
-        // }
         teaGardenSelectionPopupPage.classList.add('active');
         popupOverlay.classList.add('active');
-        attachTimerEventListeners(); // 綁定計時器事件
+        attachTeaGardenSelectionPopupListeners();
     }
 
     // 輔助函數：隱藏茶園選擇彈出視窗
     function hideTeaGardenSelectionPopup() {
         teaGardenSelectionPopupPage.classList.remove('active');
         popupOverlay.classList.remove('active');
-        // 清除計時器狀態
-        resetTimer();
     }
 
-    // 輔助函數：返回上一頁
+    // 輔助函數：顯示好友專注設定彈出視窗
+    async function showFriendFocusSettingsPopup() {
+        const filePath = `pages/friend_focus_settings.html`;
+        try {
+            const response = await fetch(filePath);
+            if (!response.ok) {
+                throw new Error(`無法載入好友專注設定頁面：${response.statusText}`);
+            }
+            const htmlContent = await response.text();
+            friendFocusSettingsPopupPage.innerHTML = htmlContent;
+            friendFocusSettingsPopupPage.classList.add('active');
+            popupOverlay.classList.add('active');
+
+            attachFriendFocusSettingsPopupListeners();
+
+        } catch (error) {
+            console.error('載入好友專注設定頁面失敗:', error);
+        }
+    }
+
+    // 輔助函數：隱藏好友專注設定彈出視窗
+    function hideFriendFocusSettingsPopup() {
+        friendFocusSettingsPopupPage.classList.remove('active');
+        // 只有當沒有其他彈出視窗活躍時才關閉遮罩
+        if (!teaGardenSelectionPopupPage.classList.contains('active') && !focusCompletionPopupPage.classList.contains('active')) {
+             popupOverlay.classList.remove('active');
+        }
+    }
+
+    // 輔助函數：顯示專注完成彈出視窗
+    async function showFocusCompletionPopup(durationInSeconds) {
+        const filePath = `pages/focus_completion.html`;
+        try {
+            const response = await fetch(filePath);
+            if (!response.ok) {
+                throw new Error(`無法載入專注完成頁面：${response.statusText}`);
+            }
+            const htmlContent = await response.text();
+            focusCompletionPopupPage.innerHTML = htmlContent;
+            focusCompletionPopupPage.classList.add('active');
+            popupOverlay.classList.add('active'); // 確保遮罩層也活躍
+
+            // 更新完成頁面上的動態內容
+            const completionMessage = focusCompletionPopupPage.querySelector('#completion-message-text');
+            if (completionMessage) {
+                // 這裡可以使用實際的茶園名稱和茶種
+                completionMessage.textContent = `恭喜！在${selectedGardenName}種${selectedTeaType}成功烘焙出：xxxxxx`;
+            }
+            const completionTimeDisplay = focusCompletionPopupPage.querySelector('#completion-time-display-value');
+            if (completionTimeDisplay) {
+                completionTimeDisplay.textContent = formatSecondsToMinutesSeconds(durationInSeconds);
+            }
+
+            attachFocusCompletionPopupListeners();
+
+        } catch (error) {
+            console.error('載入專注完成頁面失敗:', error);
+        }
+    }
+
+    // 輔助函數：隱藏專注完成彈出視窗
+    function hideFocusCompletionPopup() {
+        focusCompletionPopupPage.classList.remove('active');
+        if (!teaGardenSelectionPopupPage.classList.contains('active') && !friendFocusSettingsPopupPage.classList.contains('active')) {
+             popupOverlay.classList.remove('active');
+        }
+        loadPage('main', false); // 關閉完成視窗後回到主頁面
+    }
+
+
+    // 輔助函數：返回上一頁（優先處理最上層的彈出視窗或正在進行的專注會話）
     function goBack() {
-        // 1. 如果彈出視窗打開，則關閉彈出視窗
+        // 1. 如果有專注會話正在進行，則中途終止
+        if (focusTimerInterval) {
+            endFocusSession(false);
+            return;
+        }
+        // 2. 如果專注完成彈出視窗打開，則關閉它並回主頁
+        if (focusCompletionPopupPage.classList.contains('active')) {
+            hideFocusCompletionPopup();
+            return;
+        }
+        // 3. 如果好友專注設定彈出視窗打開，則關閉它
+        if (friendFocusSettingsPopupPage.classList.contains('active')) {
+            hideFriendFocusSettingsPopup();
+            return;
+        }
+        // 4. 如果茶園選擇彈出視窗打開，則關閉它
         if (teaGardenSelectionPopupPage.classList.contains('active')) {
             hideTeaGardenSelectionPopup();
             return;
         }
 
-        // 2. 如果沒有彈出視窗，檢查頁面歷史
-        if (pageHistory.length > 1) { // 至少要有當前頁和前一頁
-            pageHistory.pop(); // 移除當前頁
-            const previousPage = pageHistory[pageHistory.length - 1]; // 獲取前一頁
-            loadPage(previousPage, false); // 載入前一頁，但不加入歷史
+        // 5. 如果沒有彈出視窗或專注會話，檢查頁面歷史
+        if (pageHistory.length > 1) {
+            pageHistory.pop();
+            const previousPage = pageHistory[pageHistory.length - 1];
+            loadPage(previousPage, false);
         } else {
-            // 如果沒有歷史，回到主頁面
-            loadPage('main', false); // 回到主頁面，且不將其添加到歷史（因為它是默認的）
-            pageHistory = ['main']; // 重置歷史為只有主頁
+            loadPage('main', false);
+            pageHistory = ['main'];
         }
     }
 
-    // ****** 計時器功能實現 (與 popup 相關，所以邏輯放在這裡) ******
-    const timeInput = teaGardenSelectionPopupPage.querySelector('.time-input');
-    const teaTypeCircle = teaGardenSelectionPopupPage.querySelector('.tea-type-circle');
-    const countdownText = teaTypeCircle.querySelector('.countdown-text');
-    let timerInterval = null;
-    let totalSeconds = 0;
-    let remainingSeconds = 0;
+    // 綁定茶園選擇彈出視窗的事件
+    function attachTeaGardenSelectionPopupListeners() {
+        const personalStartButton = teaGardenSelectionPopupPage.querySelector('[data-action="start-personal-focus"]');
+        const friendStartButton = teaGardenSelectionPopupPage.querySelector('[data-action="open-friend-focus-settings"]');
+        const timeInput = teaGardenSelectionPopupPage.querySelector('.time-input');
 
-    function parseTimeToSeconds(timeString) {
-        const parts = timeString.split(':');
-        if (parts.length === 2) {
-            const hours = parseInt(parts[0], 10);
-            const minutes = parseInt(parts[1], 10);
-            return (hours * 3600) + (minutes * 60);
-        }
-        return 0;
-    }
-
-    function formatSecondsToDisplay(seconds) {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
-
-    function updateTimerDisplay() {
-        if (remainingSeconds <= 0) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            teaTypeCircle.style.setProperty('--timer-progress', '0%');
-            countdownText.textContent = '包種茶'; // 倒數結束後顯示預設文本
-            alert('專注時間結束！');
-            resetTimerControls(true); // 啟用按鈕和輸入框
-            return;
-        }
-
-        const progress = (remainingSeconds / totalSeconds) * 100;
-        teaTypeCircle.style.setProperty('--timer-progress', `${progress}%`);
-        countdownText.textContent = formatSecondsToDisplay(remainingSeconds);
-
-        remainingSeconds--;
-    }
-
-    function startTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-        }
-
-        const selectedTime = timeInput.value;
-        totalSeconds = parseTimeToSeconds(selectedTime);
-
-        if (totalSeconds <= 0) {
-            alert('請輸入有效的專注時間！');
-            return;
-        }
-
-        remainingSeconds = totalSeconds;
-        resetTimerControls(false); // 禁用按鈕和輸入框
-
-        teaTypeCircle.style.setProperty('--timer-progress', '100%');
-        countdownText.textContent = formatSecondsToDisplay(remainingSeconds);
-
-        timerInterval = setInterval(updateTimerDisplay, 1000);
-    }
-
-    function resetTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
-        teaTypeCircle.style.setProperty('--timer-progress', '100%');
-        countdownText.textContent = '包種茶'; // 重置為預設文本
-        timeInput.value = "00:00"; // 重置時間輸入框
-        resetTimerControls(true); // 啟用按鈕和輸入框
-    }
-
-    function resetTimerControls(enabled) {
-        teaGardenSelectionPopupPage.querySelectorAll('[data-action^="start-"]').forEach(button => {
-            button.disabled = !enabled;
-        });
-        timeInput.disabled = !enabled;
-    }
-
-    // 綁定計時器相關事件（在顯示彈出視窗時呼叫）
-    function attachTimerEventListeners() {
         if (timeInput) {
-            timeInput.value = "00:00"; // 確保每次打開都是 00:00
+            timeInput.value = "00:00";
         }
-        teaGardenSelectionPopupPage.querySelector('[data-action="start-personal-focus"]')
-            .onclick = startTimer;
-        teaGardenSelectionPopupPage.querySelector('[data-action="start-friend-focus"]')
-            .onclick = startTimer;
-        teaGardenSelectionPopupPage.querySelector('[data-action="close-popup"]')
-            .onclick = hideTeaGardenSelectionPopup;
-    }
-    // ****** 計時器功能結束 ******
 
+        if (personalStartButton) {
+            personalStartButton.onclick = function() {
+                const selectedTime = timeInput ? timeInput.value : "00:00";
+                const duration = parseTimeToSeconds(selectedTime);
+                if (duration <= 0) {
+                    alert('請輸入有效的專注時間！');
+                    return;
+                }
+                focusTotalSeconds = duration;
+                focusRemainingSeconds = duration;
+                hideTeaGardenSelectionPopup(); // 開始專注前先關閉選擇彈出視窗
+                loadPage('focus_session'); // 跳轉到專注頁面
+            };
+        }
+        if (friendStartButton) {
+            friendStartButton.onclick = showFriendFocusSettingsPopup;
+        }
 
-    // 綁定所有頁面共用的事件監聽器
-    function attachGlobalEventListeners() {
-        // 全局返回按鈕邏輯
-        document.body.addEventListener('click', function(event) {
-            const target = event.target.closest('.back-button');
-            if (target && target.dataset.action !== 'close-popup') { // 排除 popup 自身的關閉按鈕
-                goBack();
-            }
-        });
-        
-        // 彈出視窗關閉按鈕
-        const closePopupBtn = document.getElementById('closeTeaGardenSelectionPopup');
-        if (closePopupBtn) {
-            closePopupBtn.addEventListener('click', hideTeaGardenSelectionPopup);
+        const closeTeaGardenSelectionPopupBtn = document.getElementById('closeTeaGardenSelectionPopup');
+        if (closeTeaGardenSelectionPopupBtn) {
+            closeTeaGardenSelectionPopupBtn.onclick = hideTeaGardenSelectionPopup;
         }
     }
+
+    // 綁定好友專注設定彈出視窗的事件
+    function attachFriendFocusSettingsPopupListeners() {
+        const confirmButton = friendFocusSettingsPopupPage.querySelector('.confirm-friend-focus');
+        const friendLimitInput = friendFocusSettingsPopupPage.querySelector('.friend-limit-input');
+        const backButton = friendFocusSettingsPopupPage.querySelector('[data-action="close-friend-focus-popup"]');
+
+        if (friendLimitInput) {
+            friendLimitInput.value = "0";
+        }
+
+        if (confirmButton) {
+            confirmButton.onclick = function() {
+                const selectedTime = teaGardenSelectionPopupPage.querySelector('.time-input').value;
+                const friendLimit = friendLimitInput ? parseInt(friendLimitInput.value, 10) : 0;
+                const duration = parseTimeToSeconds(selectedTime);
+
+                if (duration <= 0) {
+                    alert('請輸入有效的專注時間！');
+                    return;
+                }
+                if (friendLimit <= 0) {
+                    alert('請設定有效的好友人數上限！');
+                    return;
+                }
+
+                focusTotalSeconds = duration;
+                focusRemainingSeconds = duration;
+                // alert(`好友專注開始！預計時間: ${selectedTime}，人數上限: ${friendLimit}人`); // 這裡不需要 alert
+                hideFriendFocusSettingsPopup(); // 關閉好友設定彈出視窗
+                hideTeaGardenSelectionPopup(); // 同時關閉茶園選擇彈出視窗
+                loadPage('focus_session'); // 跳轉到專注頁面
+            };
+        }
+        if (backButton) {
+            backButton.onclick = hideFriendFocusSettingsPopup;
+        }
+    }
+
+    // 綁定專注完成彈出視窗的事件
+    function attachFocusCompletionPopupListeners() {
+        const returnButton = focusCompletionPopupPage.querySelector('.return-to-main-button');
+        if (returnButton) {
+            returnButton.onclick = hideFocusCompletionPopup; // 點擊返回主頁
+        }
+    }
+
 
     // 綁定動態載入內容中的事件監聽器
     function attachEventListenersToLoadedContent() {
@@ -228,18 +360,26 @@ document.addEventListener('DOMContentLoaded', function() {
             mapFriendsButton.addEventListener('click', () => loadPage('friends'));
         }
 
-        // 注意：對於其他頁面內的按鈕 (如設置頁面內的 "帳號設定")
-        // 如果它們也需要導航，請在此處添加相應的事件監聽器。
-        // 例如：
-        // const accountSettingsBtn = mainContentArea.querySelector('.settings-page-container .settings-button');
-        // if (accountSettingsBtn) {
-        //     accountSettingsBtn.addEventListener('click', () => alert('導航到帳號設定詳情頁面'));
-        // }
+        // 專注會話頁面中的「中途終止」按鈕
+        const stopButton = mainContentArea.querySelector('.focus-session-page-container .stop-button');
+        if (stopButton) {
+            stopButton.addEventListener('click', () => endFocusSession(false)); // 中途終止
+        }
+
+        // 其他內容頁面內的返回按鈕
+        mainContentArea.querySelectorAll('.back-button').forEach(button => {
+            // 確保不是彈出視窗的返回按鈕，並且不在專注會話頁面中
+            // 判斷方式改為檢查是否存在 data-action="close-popup" 或 data-action="close-friend-focus-popup"
+            const isPopupCloseButton = button.dataset.action === 'close-popup' || button.dataset.action === 'close-friend-focus-popup';
+            const isInsideFocusSession = button.closest('.focus-session-page-container');
+
+            if (!isPopupCloseButton && !isInsideFocusSession) {
+                 button.addEventListener('click', goBack);
+            }
+        });
     }
 
-
-    // 初始載入主頁面並綁定全局事件
-    loadPage('main', false); // 首次載入不加入歷史
-    pageHistory.push('main'); // 將主頁作為歷史記錄的第一項
-    attachGlobalEventListeners();
+    // 初始載入主頁面
+    loadPage('main', false);
+    pageHistory.push('main');
 });
