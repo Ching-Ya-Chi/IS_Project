@@ -28,9 +28,16 @@
                 </header>
                 <div class="selection-content">
                     <div class="tea-type-circle">
-                        <span class="countdown-text">包種茶</span>
+                        <img id="teaGardenImage" src="" alt="Tea Type Image"> <!-- 新增：用於顯示圖片的img標籤 -->
                     </div>
-                    <div class="focus-time-display">
+                    <!-- 新增：滑桿容器，用於調整時間並顯示分鐘數 -->
+                    <div class="time-slider-container">
+                        <label for="timeSlider">設定專注時間:</label>
+                        <input type="range" id="timeSlider" min="1" max="180" value="30" class="focus-duration-slider">
+                        <span id="sliderTimeDisplay">30 分鐘</span>
+                    </div>
+                    <!-- 保持原有的 input[type="time"] 但設為隱藏，其值將由滑桿更新，以確保原有按鈕邏輯不受影響 -->
+                    <div class="focus-time-display" style="display: none;">
                         <span>預計專注時間 </span><input type="time" class="time-input" value="00:00">
                     </div>
                     <div class="action-buttons">
@@ -50,8 +57,18 @@
                 <!-- 內容將由 script.js 動態載入 -->
             </div>
 
-            <!-- 中途終止彈出視窗 (新加入的彈出視窗) -->
+            <!-- 中途終止彈出視窗 -->
             <div class="page focus-early-termination-page" id="focus-early-termination-popup-page">
+                <!-- 內容將由 script.js 動態載入 -->
+            </div>
+
+            <!-- 裝扮選擇彈出視窗 (新加入) -->
+            <div class="page decoration-selection-page" id="decoration-selection-popup-page">
+                <!-- 內容將由 script.js 動態載入 -->
+            </div>
+
+            <!-- 茶葉收藏彈出視窗 (新加入) -->
+            <div class="page tea-collection-popup-page" id="tea-collection-popup-page">
                 <!-- 內容將由 script.js 動態載入 -->
             </div>
 
