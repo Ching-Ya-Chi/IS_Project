@@ -1081,7 +1081,6 @@ input[type="number"] {
     transform: translate(-50%, -50%);
     z-index: 80; /* 比其他彈出視窗更高 */
     padding: 0;
-    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
