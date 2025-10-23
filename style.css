@@ -1140,3 +1140,74 @@ input[type="number"] {
 .return-to-main-button:hover {
     background-color: #e0e0e0;
 }
+
+/* ****** 中途終止彈出視窗樣式 (focus-early-termination-page) ****** */
+.page.focus-early-termination-page {
+    width: 90%;
+    max-width: 330px;
+    height: 70%;
+    max-height: 480px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 90;
+    padding: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between; /* 這裡也要加上，讓內容和按鈕推開 */
+    text-align: center;
+}
+
+.early-termination-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around; /* 使內容垂直分佈 */
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.early-termination-message {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #333;
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+.early-termination-tea-image-placeholder {
+    width: 150px;
+    height: 150px;
+    background-color: #E0E0E0; /* 灰色背景作為圖片佔位符 */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #555;
+    font-size: 0.9em;
+    margin: 30px 0;
+}
+
+.early-termination-time-display {
+    font-size: 1.2em;
+    color: #333;
+    /* margin-bottom: 30px; 這裡可以移除，讓父元素的 space-around 控制 */
+}
+
+.early-termination-return-button {
+    width: 70%;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer;
+    margin-bottom: 20px; /* 這裡的 margin-bottom 依然有效，用於最底部 */
+    transition: background-color 0.3s;
+}
+.early-termination-return-button:hover {
+    background-color: #e0e0e0;
+}
