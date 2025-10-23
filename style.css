@@ -1,0 +1,919 @@
+
+input[type="time"]::-webkit-datetime-edit-ampm-field {
+    display: none;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.phone-frame {
+    width: 375px;
+    height: 700px;
+    background-color: #8B6535;
+    border-radius: 40px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    border-radius: 25px;
+    overflow: hidden;
+    position: relative; /* 關鍵：為內部絕對定位的元素提供上下文 */
+    display: flex;
+    flex-direction: column;
+}
+
+.dynamic-island {
+    width: 120px;
+    height: 25px;
+    background-color: #000000;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100; /* 確保在所有頁面之上 */
+}
+
+/* ****** 半透明遮罩 (Popup Overlay) ****** */
+#popup-overlay { /* 改用 ID 選擇器 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色 */
+    z-index: 55; /* 介於背景頁面和彈出視窗之間 */
+    display: none; /* 預設隱藏 */
+    border-radius: 25px; /* 與 phone-screen 圓角一致 */
+}
+#popup-overlay.active {
+    display: block; /* 顯示遮罩 */
+}
+
+/* ****** 頁面內容容器的通用樣式 ****** */
+/* 這些樣式將應用於動態載入到 #main-content-area 內的根元素 */
+#main-content-area {
+    width: 100%;
+    height: 100%;
+    display: flex; /* 確保內部內容可以垂直佈局 */
+    flex-direction: column;
+    box-sizing: border-box;
+    border-radius: 25px; /* 與 phone-screen 圓角一致 */
+    overflow: hidden; /* 防止內容溢出 */
+}
+
+/* ****** 彈出視窗的通用樣式 ****** */
+/* 這裡的 .page 樣式現在只針對彈出視窗 */
+.page.tea-garden-selection-page {
+    width: 90%; /* 相對寬度 */
+    max-width: 330px; /* 最大寬度 */
+    height: 80%; /* 相對高度 */
+    max-height: 550px; /* 最大高度 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 居中 */
+    border-radius: 15px; /* 圓角 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 浮動陰影 */
+    z-index: 60; /* 介於 overlay 和 dynamic-island 之間 */
+    padding: 0; /* 內部內容自己控制 padding */
+    overflow: hidden; /* 確保內容在圓角內 */
+    position: absolute; /* 讓頁面堆疊，而不是擠壓 */
+    background-color: #ffffff; /* 確保頁面有背景色覆蓋下方內容 */
+    display: none; /* 預設隱藏 */
+    flex-direction: column;
+    box-sizing: border-box;
+}
+.page.tea-garden-selection-page.active {
+    display: flex; /* 顯示活躍的彈出視窗 */
+}
+
+
+/* ---------------------------------------------------- */
+/* ****** 主頁面樣式 (main-page-container) ****** */
+.main-page-container {
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+    width: 100%; /* 確保容器佔滿 */
+    height: 100%; /* 確保容器佔滿 */
+    display: flex;
+    flex-direction: column;
+}
+.main-page-container .header {
+    height: 120px;
+    background-color: #D4B886;
+    padding: 40px 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    box-sizing: border-box;
+    z-index: 1;
+}
+.main-page-container .header-icon {
+    font-size: 24px;
+    color: #333;
+    width: 40px;
+    text-align: center;
+    cursor: pointer;
+}
+.main-page-container .focus-display {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 8px 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+.main-page-container .focus-label {
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #333;
+}
+.main-page-container .focus-time {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.main-content-area-inner { /* 原 main-content */
+    flex-grow: 1;
+    background-color: white;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    box-sizing: border-box;
+}
+.character-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.plant-sprite {
+    width: 100%;
+    height: 100%;
+    background-color: #90EE90;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.plant-sprite img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.tea-set {
+    position: absolute;
+    left: -80px;
+    bottom: 20px;
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+}
+.tea-set img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.main-content-area-inner .enter-button {
+    width: 80%;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 25px;
+    font-size: 18px;
+    margin: 20px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.main-content-area-inner .friends-button {
+    width: 50%;
+    padding: 12px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.main-content-area-inner .enter-button:hover,
+.main-content-area-inner .friends-button:hover {
+    background-color: #e0e0e0;
+}
+
+
+/* ---------------------------------------------------- */
+/* ****** 設定頁面樣式 (settings-page-container) ****** */
+.settings-page-container {
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.settings-header {
+    height: 120px;
+    background-color: #D4B886;
+    padding: 40px 20px 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+.settings-page-container .back-button {
+    position: absolute;
+    left: 20px;
+    font-size: 24px;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+}
+.settings-title {
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px;
+    background-color: #E0E0E0;
+    border-radius: 10px;
+    margin: 0 40px;
+}
+.settings-content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    box-sizing: border-box;
+}
+.settings-button {
+    width: 100%;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 15px;
+    font-size: 18px;
+    margin: 10px 0;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.settings-button:hover { background-color: #e0e0e0; }
+
+
+/* ---------------------------------------------------- */
+/* ****** 排行榜頁面樣式 (ranking-page-container) ****** */
+.ranking-page-container {
+    justify-content: flex-start;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.ranking-header {
+    height: 120px;
+    background-color: #D4B886;
+    padding: 40px 20px 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+.ranking-page-container .back-button {
+    position: absolute;
+    left: 20px;
+    font-size: 24px;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+}
+.ranking-title {
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin: 0 40px;
+}
+.ranking-content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    box-sizing: border-box;
+}
+.ranking-table-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.ranking-column {
+    flex: 1;
+    text-align: center;
+}
+.ranking-column:first-child { flex: 0.5; }
+
+
+/* ---------------------------------------------------- */
+/* ****** 好友列表頁面樣式 (friend-page-container) ****** */
+.friend-page-container {
+    justify-content: flex-start;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.friend-header {
+    height: 120px;
+    background-color: #D4B886;
+    padding: 40px 20px 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+.friend-page-container .back-button {
+    position: absolute;
+    left: 20px;
+    font-size: 24px;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+}
+.friend-title {
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin: 0 40px;
+}
+.friend-page-container .content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    box-sizing: border-box;
+}
+.add-friend-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+.friend-account-input {
+    flex-grow: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #E0E0E0;
+    font-size: 1em;
+    outline: none;
+}
+.add-button {
+    padding: 12px 20px;
+    background-color: #E0E0E0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    white-space: nowrap;
+}
+.friend-list-headers {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.1em;
+    width: 100%;
+    box-sizing: border-box;
+}
+.friend-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.username { font-size: 1.1em; }
+.join-button {
+    padding: 8px 15px;
+    background-color: #E0E0E0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+}
+
+
+/* ---------------------------------------------------- */
+/* ****** 地圖頁面樣式 (map-page-container) ****** */
+.map-page-container {
+    padding: 0;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.map-header {
+    width: 100%;
+    height: 80px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    background-color: #D4B886;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    position: relative;
+}
+.map-page-container .back-button {
+    position: absolute;
+    left: 20px;
+    font-size: 24px;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+}
+.map-header div {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin: 0 40px;
+}
+.map-container {
+    width: 100%;
+    background-color: #4CAF50;
+    flex-grow: 1;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 20px 20px 20px;
+    position: relative;
+    font-size: 1.5em;
+    color: black;
+    box-sizing: border-box;
+}
+.map-text-top { font-size: 1.2em; margin-top: 10px; color: white; }
+.map-text-bottom { font-size: 1.2em; margin-bottom: 10px; color: white; }
+.tea-garden-circle {
+    width: 100px; height: 100px;
+    background-color: #cccccc;
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+}
+.map-container .tea-garden-circle:nth-of-type(1) { top: 100px; left: 50px; }
+.map-container .tea-garden-circle:nth-of-type(2) { top: 150px; right: 50px; }
+.map-container .tea-garden-circle:nth-of-type(3) { bottom: 100px; left: 80px; }
+
+.map-page-container .friends-button-container {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    background-color: #ffffff;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    z-index: 10;
+}
+.map-page-container .friends-button {
+    background-color: #E0E0E0;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+}
+.map-page-container .friends-button::before { font-size: 1.2em; }
+
+
+/* ---------------------------------------------------- */
+/* ****** 成就與裝扮頁面樣式 (achievement-decoration-page-container) ****** */
+.achievement-decoration-page-container {
+    justify-content: flex-start;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.achievement-decoration-header {
+    height: 120px;
+    background-color: #D4B886;
+    padding: 40px 20px 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+.achievement-decoration-page-container .back-button {
+    position: absolute;
+    left: 20px;
+    font-size: 24px;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+}
+.achievement-decoration-title {
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px;
+    background-color: #E0E0E0;
+    border-radius: 10px;
+    margin: 0 40px;
+}
+.achievement-decoration-content {
+    flex-grow: 1;
+    background-color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+.top-blocks {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 20px;
+}
+.decoration-block {
+    width: 120px;
+    height: 150px;
+    background-color: #E0E0E0;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 10px;
+    position: relative;
+}
+.decoration-block .status-button {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 15px;
+    background-color: #F0E0E0;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+.tea-collection-block {
+    flex-grow: 1;
+    height: 150px;
+    background-color: #E0E0E0;
+    border-radius: 8px;
+}
+.description-text {
+    text-align: center;
+    color: #555;
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-top: 20px;
+}
+.apply-button {
+    width: calc(100% - 40px);
+    padding: 15px;
+    background-color: #E0E0E0;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer;
+    margin-top: auto;
+    margin-bottom: 0;
+}
+
+/* ---------------------------------------------------- */
+/* ****** 茶櫃頁面樣式 (tea-cabinet-page-container) ****** */
+.tea-cabinet-page-container {
+    justify-content: flex-start;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.tea-cabinet-header {
+    height: 120px;
+    background-color: #D4B886;
+    padding: 40px 20px 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+.tea-cabinet-page-container .back-button {
+    position: absolute;
+    left: 20px;
+    font-size: 24px;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+}
+.tea-cabinet-title {
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    padding: 10px;
+    background-color: #E0E0E0;
+    border-radius: 10px;
+    margin: 0 40px;
+}
+.tea-cabinet-content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+.tea-item-block {
+    width: calc(100% - 40px);
+    height: 150px;
+    background-color: #E0E0E0;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ---------------------------------------------------- */
+/* ****** 茶園選擇彈出視窗樣式 (Popup Window) ****** */
+.selection-header {
+    height: 80px;
+    background-color: #E0E0E0;
+    padding: 0 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    border-top-left-radius: 15px; /* 與彈出視窗自身的圓角對齊 */
+    border-top-right-radius: 15px;
+}
+/* 彈出視窗的返回按鈕 */
+.tea-garden-selection-page .back-button {
+    position: absolute;
+    left: 20px;
+    font-size: 24px;
+    color: #333;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+}
+.selection-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 40px;
+}
+.selection-content {
+    flex-grow: 1;
+    background-color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    border-bottom-left-radius: 15px; /* 與彈出視窗自身的圓角對齊 */
+    border-bottom-right-radius: 15px;
+    overflow-y: auto;
+}
+.mini-map-block {
+    width: calc(100% - 40px);
+    height: 150px;
+    background-color: #4CAF50;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    position: relative;
+    color: white;
+    font-size: 1.2em;
+}
+.mini-tea-garden-circle {
+    width: 80px;
+    height: 80px;
+    background-color: #cccccc;
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    bottom: -40px; /* 半圓形在下方突出 */
+    transform: translateX(-50%);
+}
+.tea-type-circle {
+    width: 180px;
+    height: 180px;
+    background-color: #E0E0E0; /* 圓圈計時器清空時的底色 */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin-top: 20px;
+    position: relative; /* 確保文本 z-index 有效 */
+    overflow: hidden; /* 隱藏超出圓圈的內容，確保 conic-gradient 效果 */
+    /* 使用 conic-gradient 模擬進度條效果 */
+    /* --timer-progress 是一個 CSS 變數，可以透過 JavaScript 來更新，例如從 100% 減到 0% */
+    background: conic-gradient(#90EE90 0% var(--timer-progress, 100%), #E0E0E0 var(--timer-progress, 100%) 100%);
+    transition: background 0.1s linear; /* 平滑過渡效果 */
+}
+/* 新增用於顯示倒數計時的文本樣式 */
+.tea-type-circle .countdown-text {
+    font-size: 1.5em; /* 與圓圈原有的字體大小一致 */
+    font-weight: bold;
+    color: #333;
+    position: relative;
+    z-index: 2; /* 確保在進度條上方 */
+}
+
+.focus-time-display {
+    font-size: 1.2em;
+    color: #333;
+    margin-top: 15px;
+    display: flex; /* 讓文字和輸入框保持一行 */
+    align-items: center; /* 垂直居中對齊 */
+}
+/* 針對新的時間輸入框添加樣式 */
+.focus-time-display .time-input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1em;
+    color: #333;
+    text-align: center;
+    margin-left: 10px; /* 與文字的間距 */
+    width: 120px; /* 固定寬度 */
+    -webkit-appearance: none; /* 移除某些瀏覽器預設樣式 */
+    -moz-appearance: none;
+    appearance: none;
+    /* 隱藏時間選擇圖示 */
+    /* 注意：這會移除時間選擇器功能，用戶需要手動輸入時間 */
+    &::-webkit-calendar-picker-indicator {
+        display: none;
+    }
+    /* Firefox */
+    &::-moz-time-picker-indicator {
+        display: none;
+    }
+    /* Edge */
+    &::-ms-clear { /* for IE/Edge clear button */
+        display: none;
+    }
+}
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+    margin-top: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.action-button {
+    flex-grow: 1;
+    max-width: 150px;
+    padding: 12px 20px;
+    background-color: #E0E0E0;
+    border: none;
+    border-radius: 20px;
+    font-size: 1.1em;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.action-button:hover {
+    background-color: #d0d0d0;
+}

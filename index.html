@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>茶園專注應用</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <div class="dynamic-island"></div>
+            <div id="popup-overlay" class="popup-overlay"></div> <!-- 遮罩層 -->
+
+            <!-- 主要內容區域，用於動態載入各頁面內容 -->
+            <div id="main-content-area">
+                <!-- 頁面內容將載入到這裡 -->
+            </div>
+
+            <!-- 茶園選擇彈出視窗 (Popup Window) - 它是固定在主框架中的 -->
+            <!-- 這裡仍然使用 .page 樣式，因為它需要獨立的定位和層級 -->
+            <div class="page tea-garden-selection-page" id="tea-garden-selection-popup-page">
+                <header class="selection-header">
+                    <button id="closeTeaGardenSelectionPopup" class="back-button" data-action="close-popup">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="selection-title">金城茶園</div>
+                </header>
+                <div class="selection-content">
+                    <div class="tea-type-circle" style="--timer-progress: 100%;">
+                        <span class="countdown-text">包種茶</span>
+                    </div>
+                    <div class="focus-time-display">
+                        <span>預計專注時間 </span><input type="time" class="time-input" value="00:00">
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-button personal-start" data-action="start-personal-focus">個人開始</button>
+                        <button class="action-button friend-start" data-action="start-friend-focus">好友開始</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
