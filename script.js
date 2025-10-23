@@ -11,12 +11,17 @@ document.addEventListener('DOMContentLoaded', function() {
     let pageHistory = [];
     let currentDecorationImage = './img/IdlePerson.png'; // 追蹤主頁當前裝扮圖片 (角色圖片)
 
+    // 新增：用於追蹤本次專注所培育出的茶種和圖片 (用於完成頁面)
+    let currentFocusedTeaName = '未知茶種'; // 預設值，將被隨機選擇的茶種名稱覆蓋
+    let currentFocusedTeaImageSrc = './img/tea_placeholder.png'; // 預設值，將被隨機選擇的茶種圖片覆蓋
+
+
     // ****** 專注時間對應的圖片組 (新增) ******
     const timeBasedImages = [
-        './img/紅茶_日月潭.png', // 1-45 分鐘
-        './img/紅茶_阿薩姆.png', // 46-90 分鐘
-        './img/紅茶_蜜香.png', // 91-135 分鐘
-        './img/紅茶_錫蘭.png'  // 136-180 分鐘
+        './img/white_tea.png', // 1-45 分鐘
+        './img/oolong_tea.png', // 46-90 分鐘
+        './img/red_tea.png', // 91-135 分鐘
+        './img/black_tea.png'  // 136-180 分鐘
     ];
     // 請將上述路徑替換為您實際的圖片路徑
     // ****** 專注時間對應的圖片組結束 ******
@@ -43,29 +48,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // ****** 成就與裝扮圖片組數據結構結束 ******
 
 
-    // ****** 茶葉圖片數據結構 ******
+    // ****** 茶葉圖片數據結構 (新增了 `name` 屬性) ******
     const teaImagesByCategory = {
         'red_tea': [
-            { src: './img/紅茶_日月潭.png', name: '' },
-            { src: './img/紅茶_蜜香.png', name: '' },
-            { src: './img/紅茶_錫蘭.png', name: '' },
-            { src: './img/紅茶_阿薩姆.png', name: '' }    
+            { src: './img/紅茶_日月潭.png', name: '日月潭紅茶' },
+            { src: './img/紅茶_蜜香.png', name: '蜜香紅茶' },
+            { src: './img/紅茶_錫蘭.png', name: '錫蘭紅茶' },
+            { src: './img/紅茶_阿薩姆.png', name: '阿薩姆紅茶' }
         ],
         'green_tea': [
-            { src: './img/綠茶_抹茶.png', name: '' },
-            { src: './img/綠茶_煎茶.png', name: '' },
-            { src: './img/綠茶_玉露.png', name: '' },
-            { src: './img/綠茶_碧螺春.png', name: '' },
-            { src: './img/綠茶_龍井.png', name: '' }
+            { src: './img/綠茶_抹茶.png', name: '抹茶' },
+            { src: './img/綠茶_煎茶.png', name: '煎茶' },
+            { src: './img/綠茶_玉露.png', name: '玉露' },
+            { src: './img/綠茶_碧螺春.png', name: '碧螺春' },
+            { src: './img/綠茶_龍井.png', name: '龍井' }
         ],
         'yellow_tea': [
-            { src: './img/黃茶_凍頂烏龍.png', name: '' },
-            { src: './img/黃茶_岩茶.png', name: '' },
-            { src: './img/黃茶_文山包種茶.png', name: '' },
-            { src: './img/黃茶_東方美人.png', name: '' },
-            { src: './img/黃茶_鐵觀音.png', name: '' },
-            { src: './img/黃茶_高山茶.png', name: '' },
-            { src: './img/黃茶_鳳凰單欉.png', name: '' },
+            { src: './img/黃茶_凍頂烏龍.png', name: '凍頂烏龍' },
+            { src: './img/黃茶_岩茶.png', name: '岩茶' },
+            { src: './img/黃茶_文山包種茶.png', name: '文山包種茶' },
+            { src: './img/黃茶_東方美人.png', name: '東方美人' },
+            { src: './img/黃茶_鐵觀音.png', name: '鐵觀音' },
+            { src: './img/黃茶_高山茶.png', name: '高山茶' },
+            { src: './img/黃茶_鳳凰單欉.png', name: '鳳凰單欉' },
             
         ]
     };
@@ -77,7 +82,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let focusTotalSeconds = 0;
     let focusRemainingSeconds = 0;
     let selectedGardenName = '金城茶園';
-    let selectedTeaType = '包種茶';
+    // let selectedTeaType = '包種茶'; // 這個變數現在由 currentFocusedTeaName 取代或更新
+
 
     function parseTimeToSeconds(timeString) {
         const parts = timeString.split(':');
@@ -111,7 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateFocusDisplay() {
         const remainingTimeDisplay = mainContentArea.querySelector('#remaining-time-display');
-        if (!remainingTimeDisplay) {
+        // 確保在個人專注頁面也有 remaining-time-display
+        if (!remainingTimeDisplay) { // 如果找不到計時器顯示元素，表示可能頁面已切換
             endFocusSession(false);
             return;
         }
@@ -132,12 +139,25 @@ document.addEventListener('DOMContentLoaded', function() {
         focusTimerInterval = setInterval(updateFocusDisplay, 1000);
     }
 
-    function endFocusSession(completed) {
+     function endFocusSession(completed) {
         if (focusTimerInterval) {
             clearInterval(focusTimerInterval);
             focusTimerInterval = null;
         }
-        
+
+        // ****** 新增的邏輯：從 history 中清除專注會話頁面 ******
+        // 找出歷史紀錄中是否有 'focus_session' 或 'focus_session_personal' 頁面
+        const focusPageIndex = pageHistory.findIndex(page => 
+            page === 'focus_session' || page === 'focus_session_personal'
+        );
+
+        if (focusPageIndex !== -1) {
+            // 如果找到了專注會話頁面，將其及之後的所有頁面從歷史紀錄中移除
+            // 這確保了當專注結束時，該頁面不會再被 `goBack` 訪問到
+            pageHistory.splice(focusPageIndex, pageHistory.length - focusPageIndex);
+        }
+        // ****** 新增邏輯結束 ******
+
         const actualFocusedTime = focusTotalSeconds - focusRemainingSeconds;
 
         if (completed) {
@@ -176,10 +196,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
             attachEventListenersToLoadedContent();
 
-            if (pageName === 'focus_session' && focusTotalSeconds > 0) {
+            // 修改：處理新的個人專注頁面和更新角色圖片
+            if ((pageName === 'focus_session' || pageName === 'focus_session_personal') && focusTotalSeconds > 0) {
                 const remainingTimeDisplay = mainContentArea.querySelector('#remaining-time-display');
                 if (remainingTimeDisplay) {
                     remainingTimeDisplay.textContent = formatSecondsToDisplay(focusRemainingSeconds);
+                }
+
+                // 更新專注頁面的角色圖片（無論是單人還是多人，都用 myPlantSprite1）
+                const plantSprite1 = mainContentArea.querySelector('#myPlantSprite1');
+                if (plantSprite1) {
+                    plantSprite1.src = currentDecorationImage;
+                }
+                // 如果是多人專注頁面，可能還需要更新其他兩個 (非個人專注)
+                if (pageName === 'focus_session') {
+                    const plantSprite2 = mainContentArea.querySelector('#myPlantSprite2');
+                    const plantSprite3 = mainContentArea.querySelector('#myPlantSprite3');
+                    if (plantSprite2) plantSprite2.src = currentDecorationImage; // 範例：也用自己的裝扮
+                    if (plantSprite3) plantSprite3.src = currentDecorationImage; // 範例：也用自己的裝扮
+                    // 實際應用中，這裡應該載入好友的裝扮
                 }
                 startFocusCountdown();
             }
@@ -269,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // 修改：更新 focus_completion 彈出視窗內容
     async function showFocusCompletionPopup(durationInSeconds) {
         hideAllPopups();
         const filePath = `pages/focus_completion.html`;
@@ -283,9 +319,17 @@ document.addEventListener('DOMContentLoaded', function() {
             popupOverlay.classList.add('active');
 
             const completionMessage = focusCompletionPopupPage.querySelector('#completion-message-text');
+            const completionTeaImage = focusCompletionPopupPage.querySelector('#completion-tea-image'); // 獲取圖片元素
+
             if (completionMessage) {
-                completionMessage.textContent = `恭喜！在${selectedGardenName}種${selectedTeaType}成功烘焙出：XXXXXX`;
+                // 使用 currentFocusedTeaName 和 selectedGardenName
+                completionMessage.innerHTML = `恭喜！在${selectedGardenName}種<br>${currentFocusedTeaName}成功烘焙出：${currentFocusedTeaName}`;
             }
+            if (completionTeaImage) {
+                // 使用 currentFocusedTeaImageSrc 更新圖片
+                completionTeaImage.src = currentFocusedTeaImageSrc;
+            }
+
             const completionTimeDisplay = focusCompletionPopupPage.querySelector('#completion-time-display-value');
             if (completionTimeDisplay) {
                 completionTimeDisplay.textContent = formatSecondsToMinutesSeconds(durationInSeconds);
@@ -323,9 +367,21 @@ document.addEventListener('DOMContentLoaded', function() {
             focusEarlyTerminationPopupPage.classList.add('active');
             popupOverlay.classList.add('active');
 
+            const earlyTerminationMessage = focusEarlyTerminationPopupPage.querySelector('.early-termination-message');
+            if (earlyTerminationMessage) {
+                // 更改訊息文本
+                earlyTerminationMessage.innerHTML = "茶米要隨機偷走你一杯茶";
+            }
+
             const earlyTerminationTimeDisplay = focusEarlyTerminationPopupPage.querySelector('#early-termination-time-display-value');
             if (earlyTerminationTimeDisplay) {
                 earlyTerminationTimeDisplay.textContent = formatSecondsToMinutesSeconds(actualFocusedTime);
+            }
+
+            const earlyTerminationTeaImagePlaceholder = focusEarlyTerminationPopupPage.querySelector('.early-termination-tea-image-placeholder');
+            if (earlyTerminationTeaImagePlaceholder) {
+                 // 刪除原有字串，只放置圖片
+                earlyTerminationTeaImagePlaceholder.innerHTML = `<img src="${currentFocusedTeaImageSrc}" alt="${currentFocusedTeaName}">`;
             }
 
             attachFocusEarlyTerminationPopupListeners();
@@ -494,9 +550,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const personalStartButton = teaGardenSelectionPopupPage.querySelector('[data-action="start-personal-focus"]');
         const friendStartButton = teaGardenSelectionPopupPage.querySelector('[data-action="open-friend-focus-settings"]');
         const timeInput = teaGardenSelectionPopupPage.querySelector('.time-input'); // 這是隱藏的 HH:MM 輸入框
-        const timeSlider = teaGardenSelectionPopupPage.querySelector('#timeSlider'); // 新增的滑桿
+        const timeSlider = teaGardenSelectionPopupPage.querySelector('#timeSlider'); // 滑桿
         const sliderTimeDisplay = teaGardenSelectionPopupPage.querySelector('#sliderTimeDisplay'); // 顯示滑桿分鐘數的元素
         const teaGardenImage = teaGardenSelectionPopupPage.querySelector('#teaGardenImage'); // 圓圈內的圖片
+
+        // 隨機選擇一種茶作為本次專注的成果 (更新了 currentFocusedTeaName 和 currentFocusedTeaImageSrc)
+        function selectRandomTeaResult() {
+            const categories = Object.keys(teaImagesByCategory);
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            const teasInSelectedCategory = teaImagesByCategory[randomCategory];
+            const randomTea = teasInSelectedCategory[Math.floor(Math.random() * teasInSelectedCategory.length)];
+            currentFocusedTeaName = randomTea.name;
+            currentFocusedTeaImageSrc = randomTea.src;
+        }
 
         // 根據滑桿值更新顯示的函數
         function updateTeaGardenDisplay(minutes) {
@@ -544,11 +610,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 focusTotalSeconds = duration;
                 focusRemainingSeconds = duration;
-                loadPage('focus_session');
+                selectRandomTeaResult(); // 開始專注前隨機選擇本次成果茶種
+                loadPage('focus_session_personal'); // 跳轉到新的個人專注頁面
             };
         }
         if (friendStartButton) {
-            friendStartButton.onclick = showFriendFocusSettingsPopup;
+            friendStartButton.onclick = function() {
+                // 從滑桿獲取分鐘數並轉換為秒
+                const selectedTimeMinutes = timeSlider ? parseInt(timeSlider.value, 10) : 0;
+                const duration = selectedTimeMinutes * 60;
+                if (duration <= 0) {
+                    alert('請輸入有效的專注時間！');
+                    return;
+                }
+                focusTotalSeconds = duration;
+                focusRemainingSeconds = duration;
+                selectRandomTeaResult(); // 開始專注前隨機選擇本次成果茶種
+                showFriendFocusSettingsPopup();
+            };
         }
 
         const closeTeaGardenSelectionPopupBtn = document.getElementById('closeTeaGardenSelectionPopup');
@@ -584,7 +663,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 focusTotalSeconds = duration;
                 focusRemainingSeconds = duration;
-                loadPage('focus_session');
+                // currentFocusedTeaName and currentFocusedTeaImageSrc are already set by teaGardenSelectionPopup
+                loadPage('focus_session'); // 好友專注還是跳到 focus_session (多人版)
             };
         }
         if (backButton) {
@@ -680,9 +760,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const stopButton = mainContentArea.querySelector('.focus-session-page-container .stop-button');
+        // 修改：確保 focus_session_personal 的 stopButton 也能被監聽
+        const personalStopButton = mainContentArea.querySelector('.focus-session-page-container.single-character .stop-button');
+
         if (stopButton) {
             stopButton.addEventListener('click', () => endFocusSession(false));
+        } else if (personalStopButton) { // 如果是個人專注頁面
+            personalStopButton.addEventListener('click', () => endFocusSession(false));
         }
+
 
         // 修改：成就頁面的「狀態」按鈕和「套用」按鈕事件 (新功能)
         const toggleStatusButton = mainContentArea.querySelector('#toggleAchievementStatus');

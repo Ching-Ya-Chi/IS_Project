@@ -1097,18 +1097,28 @@ input[type="number"] {
     height: 200px; /* 影片預留空間 */
     background-color: #E0E0E0; /* 淺灰色背景，作為影片的佔位符 */
     border-radius: 10px;
-    display: flex; /* 保留 flex 居中文字功能，如果未來有影片會被覆蓋 */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #555;
-    font-size: 1em;
-    text-align: center;
+    display: flex; /* 確保內部圖片可以居中 */
+    justify-content: center; /* 圖片水平居中 */
+    align-items: center; /* 圖片垂直居中 */
+    overflow: hidden; /* 確保圖片不超出邊界 */
+    /* 移除以下不再需要的樣式，因為內容是圖片而不是文本 */
+    /* color: #555; */
+    /* font-size: 1em; */
+    /* text-align: center; */
     padding: 10px;
     margin-top: 20px;
 }
-.video-placeholder p { /* 隱藏文字 */
+/* 隱藏佔位符中的文字，因為現在有圖片了 */
+.video-placeholder p {
     display: none;
+}
+
+/* 新增：影片封面圖片的樣式 */
+.video-placeholder .video-cover-image {
+    width: 100%; /* 圖片寬度填滿容器 */
+    height: 100%; /* 圖片高度填滿容器 */
+    object-fit: cover; /* 確保圖片覆蓋整個區域，可能會裁剪部分內容 */
+    border-radius: 10px; /* 讓圖片的圓角與容器一致 */
 }
 
 
@@ -1118,6 +1128,9 @@ input[type="number"] {
     width: 100%;
     margin-top: 20px;
     gap: 10px;
+}
+.character-group.single-character { /* 新增：單個角色群組的樣式 */
+    justify-content: center; /* 單個角色居中 */
 }
 .character-group .character-container {
     width: 80px; /* 調整大小以適應三個並排 */
@@ -1208,6 +1221,13 @@ input[type="number"] {
     font-size: 0.9em;
     margin: 30px 0;
 }
+/* 新增：確保 completion-tea-image 在圓形 placeholder 內適應 */
+.tea-image-placeholder img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 50%; /* 讓圖片本身也呈現圓形 */
+}
 
 .completion-time-display {
     font-size: 1.2em;
@@ -1278,6 +1298,13 @@ input[type="number"] {
     color: #555;
     font-size: 0.9em;
     margin: 30px 0;
+}
+/* 新增：確保 early-termination-tea-image-placeholder 內的圖片能圓形適應 */
+.early-termination-tea-image-placeholder img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    border-radius: 50%; /* 讓圖片本身也呈現圓形 */
 }
 
 .early-termination-time-display {
