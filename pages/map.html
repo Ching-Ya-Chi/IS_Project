@@ -1,77 +1,85 @@
 <div class="map-screen">
-        
-        <!-- 背景地圖 (請輸入圖片路徑) -->
-        <img src="../img/newImage/map.png" class="map-background">
+    
+    <!-- 背景地圖 -->
+    <img src="../img/newImage/map.png" class="map-background">
 
-        <!-- [新增] 1. 左上角返回按鈕 -->
-        <!-- 樣式已在 style.css 定義過，會自動變成圓形白底並定位在左上 -->
-        <button class="back-btn">
-            <i class="fas fa-chevron-left"></i>
-        </button>
+    <!-- 左上角返回按鈕 -->
+    <button class="back-btn">
+        <i class="fas fa-chevron-left"></i>
+    </button>
 
-        <!-- [新增] 2. 右上角使用者頭像 -->
-        <div class="map-avatar-wrapper">
-            <div class="user-avatar">
-            <!-- 圖片路徑請依需求修改 -->
+    <!-- 右上角使用者頭像 -->
+    <div class="map-avatar-wrapper">
+        <div class="user-avatar">
             <img src="https://placehold.co/100x100/4CAF50/white?text=User" alt="User">
+        </div>
+    </div>
+
+    <!-- 4個地點按鈕 (位置已透過 CSS 拉開) -->
+    <!-- 注意：移除了原本內部的 class="user-avatar-img"，改用通用樣式控制 -->
+    <div class="location-btn pos-a" data-id="A" data-title="1792 茶園">
+        <img src="../img/newImage/茶屋A.png" alt="A">
+    </div>
+    
+    <div class="location-btn pos-b" data-id="B" data-title="金城茶園">
+        <img src="../img/newImage/茶屋B.png" alt="B">
+    </div>
+    
+    <div class="location-btn pos-c" data-id="C" data-title="深坑有好茶園">
+        <img src="../img/newImage/茶屋C.png" alt="C">
+    </div>
+    
+    <div class="location-btn pos-d" data-id="D" data-title="來深坑喝茶園">
+        <img src="../img/newImage/茶屋D.png" alt="D">
+    </div>
+
+    <!-- === 互動視窗 (Modal) === -->
+    <div class="modal-overlay" id="teaModal">
+        <div class="modal-card">
+            <div class="modal-title" id="modalTitle">茶園標題</div>
+            <div class="modal-desc">
+                這裡是一段關於該茶園的簡短描述，介紹特色與環境。<br>
+                享受專注與種茶的樂趣...
             </div>
-        </div>
-        <!-- Header Buttons -->
-        <div class="back-btn-container">
-            <button class="back-btn" id="mapBackBtn"><i class="fas fa-chevron-left"></i></button>
-        </div>
-        <div class="user-avatar-container">
-            <img src="https://placehold.co/100x100/4CAF50/white?text=User" class="user-avatar-img">
-        </div>
 
-        <!-- 4個地點按鈕 -->
-        <div class="location-btn pos-a" data-id="A" data-title="1792 茶園"><span class="btn-label">A</span></div>
-        <div class="location-btn pos-b" data-id="B" data-title="金城茶園"><span class="btn-label">B</span></div>
-        <div class="location-btn pos-c" data-id="C" data-title="深坑有好茶園"><span class="btn-label">C</span></div>
-        <div class="location-btn pos-d" data-id="D" data-title="來深坑喝茶園"><span class="btn-label">D</span></div>
-
-        <!-- === 互動視窗 (Modal) === -->
-        <div class="modal-overlay" id="teaModal">
-            <div class="modal-card">
-                <!-- 標題與敘述 -->
-                <div class="modal-title" id="modalTitle">茶園標題</div>
-                <div class="modal-desc">
-                    這裡是一段關於該茶園的簡短描述，介紹特色與環境。<br>
-                    ru03ruk3ndklndlkcndkncdknd...
-                </div>
-
-                <!-- 環形計時器 -->
-                <div class="timer-wrapper" id="timerArea">
-                    <div class="timer-circle">
-                        <div class="timer-text">
-                            <div><span class="timer-val" id="displayHr">1</span> <span class="timer-unit">hr</span></div>
-                            <div><span class="timer-val" id="displayMin">20</span> <span class="timer-unit">mins</span></div>
-                        </div>
-                        <!-- 旋轉的操縱桿容器 -->
-                        <div class="knob-container" id="knobRotator">
-                            <div class="knob"></div>
-                        </div>
+            <!-- 環形計時器 -->
+            <div class="timer-wrapper" id="timerArea">
+                <div class="timer-circle">
+                    <div class="timer-text">
+                        <div><span class="timer-val" id="displayHr">1</span> <span class="timer-unit">hr</span></div>
+                        <div><span class="timer-val" id="displayMin">20</span> <span class="timer-unit">mins</span></div>
+                    </div>
+                    <div class="knob-container" id="knobRotator">
+                        <div class="knob"></div>
                     </div>
                 </div>
-
-                <!-- 茶種區塊 -->
-                <div class="tea-section-title">可能獲得的茶種</div>
-                <div class="tea-dots-container">
-                    <div class="tea-dot"></div>
-                    <div class="tea-dot active"></div>
-                    <div class="tea-dot"></div>
-                    <div class="tea-dot"></div>
-                    <div class="tea-dot active"></div>
-                    <div class="tea-dot"></div>
-                    <div class="tea-dot active"></div>
-                </div>
-
-                <!-- 輸入框 -->
-                <input type="text" class="goal-input" placeholder="設定專注目標 (選填)">
-
-                <!-- 按鈕 -->
-                <button class="enter-btn">進 入 茶 園</button>
             </div>
-        </div>
 
+            <!-- 茶種區塊 -->
+            <div class="tea-section-title">可能獲得的茶種</div>
+            <div class="tea-dots-container">
+                <div class="tea-dot"></div>
+                <div class="tea-dot active"></div>
+                <div class="tea-dot"></div>
+                <div class="tea-dot"></div>
+                <div class="tea-dot active"></div>
+            </div>
+
+            <div class="todo-section">
+                <div class="todo-input-group">
+                    <input type="text" id="mapTodoInput" class="goal-input" placeholder="輸入待辦事項...">
+                    <button id="mapAddTodoBtn" class="add-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <!-- 顯示已加入的清單 -->
+                <div id="mapTodoPreview" class="todo-preview-list">
+                <!-- JS 會動態加入項目 -->
+                <!-- <div class="preview-item">範例事項</div> -->
+                </div>
+            </div>
+            <button class="enter-btn" id = 'enterGardenBtn'>進 入 茶 園</button>
+        </div>
     </div>
+
+</div>

@@ -1,33 +1,39 @@
 <div class="screen">
-        
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" id="resultBackBtn">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="page-title">1792 茶園</div>
-        </div>
-
-        <!-- 結果文字 (由 JS 動態填入) -->
-        <div class="result-message-container">
-            <div class="result-text" id="resultMessage">
-                <!-- 範例：你已成功專注 1 hrs 20 mins !<br>恭喜獲得「紅茶」 -->
-            </div>
-        </div>
-
-        <!-- 專注清單 -->
-        <div class="checklist-card">
-            <div class="checklist-title">專注清單</div>
-            <div class="checklist-items">
-                <div class="checklist-item">閱讀書籍</div>
-                <div class="checklist-item">整理筆記</div>
-                <div class="checklist-item">不滑手機</div>
-            </div>
-        </div>
-
-        <!-- 底部圖片 (由 JS 動態更換) -->
-        <div class="bottom-visual">
-            <img src="" class="result-img" id="resultImage" alt="Result Visual">
-        </div>
-
+    
+    <!-- Header -->
+    <div class="header">
+        <button class="back-btn" id="resultBackBtn" data-page="main">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="page-title">1792 茶園</div>
     </div>
+
+    <!-- 結果文字 -->
+    <div class="result-message-container">
+        <div class="result-text" id="resultMessage">
+            <!-- JS 動態填入 -->
+        </div>
+    </div>
+
+    <!-- 專注清單 (米色方塊) -->
+    <div class="checklist-card">
+        <div class="checklist-title">專注清單</div>
+        <div class="checklist-items" id="resultChecklistItems">
+            <!-- JS 動態填入 li -->
+        </div>
+    </div>
+
+    <!-- 底部媒體區 (成功播影片，失敗放圖片) -->
+    <div class="bottom-visual">
+        <!-- 成功時播放的影片 -->
+        <video id="resultVideo" class="result-media" loop muted playsinline style="display: none;">
+            <!-- 請在此輸入您的 MP4 路徑 -->
+            <source src="../img/newImage/sunbathe.mp4" type="video/mp4">
+        </video>
+
+        <!-- 失敗/中斷時顯示的圖片 -->
+        <!-- 請在此輸入您的圖片路徑 -->
+        <img src="../img/newImage/茶米.png" id="resultImage" class="result-media" alt="Result Visual" style="display: none;">
+    </div>
+
+</div>
