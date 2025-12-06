@@ -82,14 +82,14 @@ body, html {
     align-items: center;
     justify-content: center;
     position: relative;
-    margin-top: 20px;
+    margin-top: 50px;
     flex-shrink: 0;
     z-index: 10;
 }
 
 /* 登入註冊頁的 Header 調整 */
 .login-header, .register-header {
-    margin-top: 0; 
+    margin-top: 30px; 
     margin-bottom: 20px;
     justify-content: flex-start; /* 箭頭靠左 */
 }
@@ -291,7 +291,7 @@ button { font-family: inherit; }
 .top-bar {
     width: 100%; height: 50px;
     display: flex; justify-content: space-between; align-items: center;
-    position: absolute; top: 20px; left: 0;
+    position: absolute; top: 50px; left: 0;
     padding: 0 25px; 
     z-index: 20; pointer-events: none; /* 讓點擊穿透 */
 }
@@ -326,24 +326,113 @@ button { font-family: inherit; }
 .info-section { margin-top: 80px; margin-bottom: 20px; text-align: center; }
 .info-title { font-size: 20px; color: #F4B04B; font-weight: bold; margin-bottom: 5px; }
 .info-time { font-size: 32px; color: #F4B04B; font-weight: bold; }
-
-.map-container { flex: 1; width: 100%; display: flex; justify-content: center; align-items: center; }
-.map-image { width: 100%; max-width: 300px; height: auto; object-fit: contain; }
-
 .bottom-area { width: 100%; display: flex; justify-content: center; padding-bottom: 40px; z-index: 5; }
+
+.map-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center; /* 水平置中保持不變 */
+    
+    /* ★★★ 修改重點 ★★★ */
+    /* 原本是 align-items: center (垂直置中)，導致角色太高 */
+    /* 改成 flex-start (靠上對齊)，然後用 padding-top 把角色往下推 */
+    align-items: flex-start; 
+    
+    /* 這裡控制角色往下移的距離，數值越大角色越低 */
+    /* 建議設定 80px ~ 120px 左右，讓氣泡有足夠空間 */
+    padding-top: 100px; 
+    
+    /* 允許氣泡超出容器範圍 */
+    overflow: visible; 
+    
+    margin-bottom: 0px;
+}
+/* --- 主頁角色與氣泡樣式 --- */
+
+/* 角色容器：用來定位氣泡 */
+.character-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 280px; /* 可依據圖片大小調整 */
+    height: auto;
+    display: flex;
+    justify-content: center;
+}
+
+/* 角色圖片互動感 */
+.character-img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.character-img:active {
+    transform: scale(0.95); /* 點擊時縮小效果 */
+}
+
+/* 對話氣泡框 */
+.speech-bubble {
+    position: absolute;
+    bottom: 90%; /* 位於角色上方 */
+    left: 50%;
+    transform: translateX(-50%); /* 水平置中 */
+    
+    background-color: #fff;
+    border: 2px solid #F4B04B; /* 配合主題色 */
+    border-radius: 15px;
+    padding: 10px 15px;
+    
+    font-size: 14px;
+    color: #5D4037;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.4;
+    min-width: 200px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    
+    /* 動畫效果 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none; /* 避免氣泡擋住點擊 */
+    z-index: 10;
+}
+
+/* 氣泡顯示狀態 */
+.speech-bubble.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-10px); /* 微微上浮動畫 */
+}
+
+/* 氣泡下方的小三角形 */
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; /* 位於氣泡底部 */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: #F4B04B transparent transparent transparent;
+}
 
 /* =========================================
    7. 地圖頁 (Map)
    ========================================= */
 .map-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 .map-screen .back-btn {
+    position: absolute;
     background: rgba(255,255,255,0.9); border-radius: 50%;
     width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
-    left: 20px; top: 20px;
+    left: 20px; top: 50px;
 }
 /*使用者頭像*/
 .map-avatar-wrapper {
-    position: absolute; top: 20px; right: 20px; z-index: 10;
+    position: absolute; top: 50px; right: 20px; z-index: 10;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
@@ -426,9 +515,45 @@ button { font-family: inherit; }
 .knob-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
 .knob { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 25px; height: 25px; background: #F4B04B; border-radius: 50%; cursor: grab; pointer-events: auto; }
 
-.tea-dots-container { display: flex; gap: 10px; width: 100%; justify-content: center; margin-bottom: 15px; }
-.tea-dot { width: 20px; height: 20px; border-radius: 50%; background: #ddd; }
-.tea-dot.active { background: #F4B04B; }
+.tea-dots-container { 
+    display: flex; 
+    flex-wrap: nowrap; /* ★ 關鍵：不換行 */
+    gap: 10px;         /* 間距 */
+    width: 100%; 
+    justify-content: space-between; /* ★ 關鍵：平分空間 */
+    margin-bottom: 25px;
+    min-height: 80px; 
+    padding: 0 10px; /* 左右留一點緩衝 */
+}
+.tea-preview-item {
+    flex: 1; /* ★ 關鍵：每個項目平分寬度 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+.tea-preview-item.dimmed {
+     opacity: 0.3;
+    filter: grayscale(100%);
+    transform: scale(0.85);
+}
+.tea-preview-img {
+    width: 100%;       /* 寬度跟隨容器 */
+    max-width: 60px;   /* 設定最大限制，避免太少時變得超級大 */
+    aspect-ratio: 1/1; /* 保持正圓比例 */
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #f0f0f0;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+/* 簡單的淡入動畫 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 
 .todo-section {
     width: 100%;
@@ -490,11 +615,43 @@ button { font-family: inherit; }
 .grid-scroll-area::-webkit-scrollbar { width: 0; }
 .tea-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; }
 .tea-card { border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-.card-top { height: 110px; display: flex; justify-content: center; align-items: center; }
 .tea-card.owned .card-top { background: #E0E0E0; } .tea-card.locked .card-top { background: #9E9E9E; }
 .card-bottom { height: 60px; background: #F4B04B; display: flex; justify-content: center; align-items: center; padding: 5px; text-align: center; }
 .tea-name { font-size: 16px; font-weight: bold; color: #000; }
 .locked-text { font-size: 14px; font-weight: bold; color: #000; }
+
+.tea-card .card-top { 
+    height: 140px; /* 加高一點，讓視覺更平衡 */
+    padding: 0;    /* ★ 關鍵：移除內距 */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    position: relative;
+    background-color: #E0E0E0; /* 預設背景 */
+    overflow: hidden; /* 防止圖片溢出圓角 */
+}
+
+.cabinet-tea-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 0; /* ★ 關鍵：移除圓角，填滿方格 */
+    object-fit: cover; /* 裁切填滿 */
+    transform: none;   /* 移除之前的位移 */
+    display: block;
+}
+
+/* 調整卡片上半部，確保圖片置中 */
+.card-top { 
+    height: 120px; /* 稍微加高一點給圖片空間 */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    position: relative;
+}
+
+.tea-card .card-icon {
+    z-index: 2;
+}
 
 /* =========================================
    9. 專注頁與結果 (Focus)

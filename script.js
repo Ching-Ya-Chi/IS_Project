@@ -8,13 +8,77 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 模擬資料庫
     const teaDatabase = [
-        { id: 1, type: 'black', name: '日月潭紅玉', owned: true },
-        { id: 2, type: 'black', name: '蜜香紅茶', owned: true },
-        { id: 11, type: 'green', name: '碧螺春', owned: true },
-        { id: 12, type: 'green', name: '龍井', owned: false },
-        { id: 21, type: 'white', name: '白毫銀針', owned: false },
-        { id: 31, type: 'dark', name: '普洱茶', owned: true },
+        // 綠茶類 (Green)
+        { id: 1, type: 'green', name: '玉露', owned: true },
+        { id: 2, type: 'green', name: '龍井', owned: true },
+        { id: 3, type: 'green', name: '抹茶', owned: false },
+        { id: 4, type: 'green', name: '碧螺春', owned: true },
+        { id: 5, type: 'green', name: '煎茶', owned: false },
+        
+        //青茶/烏龍類 (Oolong - 根據您的表格歸類於中間時長)
+        { id: 11, type: 'oolong', name: '文山包種茶', owned: true },
+        { id: 12, type: 'oolong', name: '岩茶', owned: false },
+        { id: 13, type: 'oolong', name: '東方美人', owned: false },
+        { id: 14, type: 'oolong', name: '高山茶', owned: true },
+        { id: 15, type: 'oolong', name: '鐵觀音', owned: true },
+        { id: 16, type: 'oolong', name: '凍頂烏龍', owned: false },
+        { id: 17, type: 'oolong', name: '鳳凰單叢', owned: false },
+
+        // 紅茶類 (Red)
+        { id: 21, type: 'red', name: '日月台', owned: true }, // 依照表格文字
+        { id: 22, type: 'red', name: '阿薩姆', owned: true },
+        { id: 23, type: 'red', name: '蜜香', owned: true }, // 表格寫"蜜香"，可能是蜜香紅茶
+        { id: 24, type: 'red', name: '錫蘭', owned: false },
+        { id: 25, type: 'red', name: '日月潭', owned: false }
     ];
+
+    // --- 2. 圖片路徑對應表 (集中管理圖片) ---
+    const teaImageMap = {
+        '玉露': '../img/綠茶_玉露.png',
+        '龍井': '../img/綠茶_龍井.png',
+        '抹茶': '../img/綠茶_抹茶.png',
+        '碧螺春': '../img/綠茶_碧螺春.png',
+        '煎茶': '../img/綠茶_煎茶.png',
+
+        '文山包種茶': '../img/青茶_文山包種茶.png',
+        '岩茶': '../img/青茶_岩茶.png',
+        '東方美人': '../img/青茶_東方美人.png',
+        '高山茶': '../img/青茶_高山茶.png',
+        '鐵觀音': '../img/青茶_鐵觀音.png',
+        '凍頂烏龍': '../img/青茶_凍頂烏龍.png',
+        '鳳凰單叢': '../img/青茶_鳳凰單欉.png',
+
+        '阿薩姆': '../img/紅茶_阿薩姆.png',
+        '蜜香': '../img/紅茶_蜜香.png',
+        '錫蘭': '../img/紅茶_錫蘭.png',
+        '日月潭': '../img/紅茶_日月潭.png',
+        
+        'default': '../img/紅茶_日月潭.png' // 預設圖片
+    };
+
+    // --- 3. 茶園產出規則 (Garden Rules) ---
+    const gardenRules = {
+        'A': {
+            'green': ['玉露', '龍井'],
+            'yellow': ['文山包種茶', '岩茶'],
+            'red': ['日月潭', '阿薩姆']
+        },
+        'B': {
+            'green': ['抹茶', '碧螺春'],
+            'yellow': ['東方美人', '高山茶'],
+            'red': ['蜜香', '阿薩姆']
+        },
+        'C': {
+            'green': ['玉露', '煎茶'],
+            'yellow': ['岩茶', '鐵觀音'],
+            'red': ['錫蘭', '日月潭']
+        },
+        'D': {
+            'green': ['碧螺春', '龍井'],
+            'yellow': ['凍頂烏龍', '鳳凰單叢'],
+            'red': ['蜜香', '錫蘭']
+        }
+    };
 
     // --- 核心路由函式 (已確認包含 arg) ---
     window.loadPage = async function(pageName, addToHistory = true, arg = null) {
@@ -94,25 +158,172 @@ document.addEventListener('DOMContentLoaded', function() {
         register: () => setupPasswordToggles(),
         modify_pw: () => setupPasswordToggles(),
         modify_acc: () => {},
-        main: () => {},
+        /*main*/ 
+        main: () => {
+        // --- 角色對話邏輯 ---
+        const charBtn = document.getElementById('mainCharacterBtn');
+        const bubble = document.getElementById('charSpeechBubble');
+        let bubbleTimer = null; // 用來儲存計時器，避免快速點擊時閃爍
+
+        const dialogueList = [
+            "「製茶需要耐心，專注也是。我們一起加油！」",
+            "「茶香逐漸飄散，你的目標也越來越近了！」",
+            "「今天也要趕快一起跟茶米繼續保持專注唷！」"
+        ];
+
+        if (charBtn && bubble) {
+            charBtn.addEventListener('click', () => {
+                // 1. 隨機抽取一句話
+                const randomIndex = Math.floor(Math.random() * dialogueList.length);
+                bubble.innerText = dialogueList[randomIndex];
+
+                // 2. 顯示氣泡
+                bubble.classList.add('show');
+
+                // 3. 重置計時器 (如果還沒消失又被點了一次，要重新倒數)
+                if (bubbleTimer) clearTimeout(bubbleTimer);
+
+                // 4. 設定 3 秒後消失
+                bubbleTimer = setTimeout(() => {
+                    bubble.classList.remove('show');
+                }, 3000);
+            });
+        }
+    },
 
         // ★★★ 地圖頁 (重點修正) ★★★
         map: () => {
+            // 1. 取得 DOM 元素
             const modal = document.getElementById('teaModal');
             const timerArea = document.getElementById('timerArea');
             const knobRotator = document.getElementById('knobRotator');
             const displayHr = document.getElementById('displayHr');
             const displayMin = document.getElementById('displayMin');
             const modalTitle = document.getElementById('modalTitle');
+            const teaContainer = document.querySelector('.tea-dots-container');
+            
+            // 2. 定義狀態變數 (放在這裡，讓內部函式都能讀取)
+            let currentGardenId = 'A'; // 預設 A 茶園
+            let currentMins = 80;      // 預設 80 分鐘 (對應黃茶)
 
-            // Modal 開關
-            document.querySelectorAll('.location-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    modalTitle.innerText = btn.getAttribute('data-title') || '茶園';
-                    modal.classList.add('active');
+            // --- 核心功能：更新茶種顯示 (顯示全部 + 變暗邏輯) ---
+            function updateTeaPreview() {
+                if (!teaContainer) return;
+
+                // A. 判斷當前時間屬於哪一類 (Active Category)
+                let activeCategory = 'green';
+                if (currentMins >= 0 && currentMins <= 60) activeCategory = 'green';
+                else if (currentMins > 60 && currentMins <= 120) activeCategory = 'yellow';
+                else activeCategory = 'red';
+
+                // B. 取得該茶園的所有規則
+                const gardenData = gardenRules[currentGardenId]; // 例如: { green: [...], yellow: [...], red: [...] }
+                
+                // C. 清空容器
+                teaContainer.innerHTML = '';
+
+                if (!gardenData) return;
+
+                // D. 定義順序：綠 -> 黃 -> 紅
+                const categories = ['green', 'yellow', 'red'];
+
+                // E. 遍歷所有類別並渲染
+                categories.forEach(category => {
+                    const teaList = gardenData[category]; // 取得該類別的茶名列表
+                    
+                    if (teaList) {
+                        teaList.forEach(teaName => {
+                            const imgSrc = teaImageMap[teaName] || teaImageMap['default'];
+                            
+                            // 判斷是否為「當前可獲得」
+                            // 如果 category 等於 activeCategory，則是正常；否則變暗
+                            const isAvailable = (category === activeCategory);
+                            const dimClass = isAvailable ? '' : 'dimmed';
+
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = `tea-preview-item ${dimClass}`;
+                            
+                            // 渲染圖片 (無文字)
+                            itemDiv.innerHTML = `
+                                <img src="${imgSrc}" class="tea-preview-img" alt="${teaName}" title="${teaName}">
+                            `;
+                            teaContainer.appendChild(itemDiv);
+                        });
+                    }
                 });
-            });
+            }
+
+            // --- 旋轉計時器邏輯 ---
+            let isDragging = false;
+
+            function updateTimeFromAngle(deg) {
+                let normalizedDeg = (deg + 360) % 360;
+                if(knobRotator) knobRotator.style.transform = `rotate(${normalizedDeg}deg)`;
+                
+                const minTime = 1, maxTime = 180;
+                let totalMins = Math.round(minTime + (normalizedDeg / 360) * (maxTime - minTime));
+                
+                // 更新全域變數
+                currentMins = totalMins;
+
+                let hr = Math.floor(totalMins / 60);
+                let min = totalMins % 60;
+                
+                if(displayHr) displayHr.innerText = hr;
+                if(displayMin) displayMin.innerText = min;
+
+                // 時間改變 -> 更新茶種狀態 (變亮/變暗)
+                updateTeaPreview();
+            }
+
+            function handleDrag(clientX, clientY) {
+                if(!timerArea) return;
+                const rect = timerArea.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                let rad = Math.atan2(clientY - centerY, clientX - centerX);
+                let deg = rad * (180 / Math.PI);
+                updateTimeFromAngle(deg - 90);
+            }
+
+            // 綁定計時器事件
+            if(timerArea) {
+                timerArea.addEventListener('mousedown', (e) => { isDragging = true; handleDrag(e.clientX, e.clientY); });
+                window.addEventListener('mousemove', (e) => { if(isDragging) { e.preventDefault(); handleDrag(e.clientX, e.clientY); }});
+                window.addEventListener('mouseup', () => isDragging = false);
+                timerArea.addEventListener('touchstart', (e) => { isDragging = true; handleDrag(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
+                window.addEventListener('touchmove', (e) => { if(isDragging) { e.preventDefault(); handleDrag(e.touches[0].clientX, e.touches[0].clientY); }}, {passive:false});
+                window.addEventListener('touchend', () => isDragging = false);
+            }
+
+            // --- Modal 開關邏輯 (修復點擊無反應) ---
+            const locationBtns = document.querySelectorAll('.location-btn');
+            
+            if (locationBtns.length > 0) {
+                locationBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // 防止冒泡
+                        
+                        console.log("茶園按鈕被點擊"); // Debug Log
+                        
+                        const gardenId = btn.getAttribute('data-id');
+                        const title = btn.getAttribute('data-title');
+                        
+                        // 更新狀態
+                        currentGardenId = gardenId;
+                        modalTitle.innerText = title || '茶園';
+                        
+                        // 初始化時間 (預設 80 分鐘)
+                        currentMins = 80;
+                        updateTimeFromAngle(180); // 旋轉到對應位置
+                        
+                        // 開啟 Modal
+                        if(modal) modal.classList.add('active');
+                    });
+                });
+            } else {
+                console.error("找不到 .location-btn 元素");
+            }
 
             if(modal) {
                 modal.addEventListener('click', (e) => {
@@ -120,13 +331,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
 
-            // 待辦清單邏輯
+            // --- 待辦清單與進入按鈕邏輯 ---
             let todoList = []; 
             const todoInput = document.getElementById('mapTodoInput');
             const addBtn = document.getElementById('mapAddTodoBtn');
             const previewList = document.getElementById('mapTodoPreview');
-            
-            // ★ 強制重抓按鈕 ID，確保抓得到
             const enterBtn = document.getElementById('enterGardenBtn'); 
 
             function renderPreview() {
@@ -154,69 +363,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
             }
-            renderPreview();
+            renderPreview(); // 初始化清單
 
-            // ★ 綁定進入按鈕
+            // 進入茶園
             if(enterBtn) {
-                console.log("JS: 成功抓到進入按鈕，已綁定事件");
-                // 使用 cloneNode 清除可能殘留的舊事件，確保乾淨綁定
+                // 清除舊事件確保乾淨
                 const newEnterBtn = enterBtn.cloneNode(true);
                 enterBtn.parentNode.replaceChild(newEnterBtn, enterBtn);
 
                 newEnterBtn.addEventListener('click', () => {
-                    console.log("JS: 進入按鈕被點擊！");
+                    let totalSecs = currentMins * 60;
                     
-                    let hr = parseInt(displayHr?.innerText || 0);
-                    let min = parseInt(displayMin?.innerText || 10);
-                    let totalSecs = (hr * 3600) + (min * 60);
+                    // 判斷當前時間區間
+                    let timeCategory = 'green';
+                    if (currentMins > 60 && currentMins <= 120) timeCategory = 'yellow';
+                    else if (currentMins > 120) timeCategory = 'red';
 
                     const sessionSettings = {
                         totalSeconds: totalSecs,
-                        checklist: todoList.length > 0 ? todoList : ['專注當下'] 
+                        checklist: todoList.length > 0 ? todoList : ['專注當下'],
+                        // 傳遞目前"有效"的茶給下一頁 (選填，若後續需要)
+                        possibleTeas: gardenRules[currentGardenId][timeCategory]
                     };
 
                     loadPage('focus', true, sessionSettings);
                 });
-            } else {
-                console.error("JS 錯誤: 找不到 ID 為 enterGardenBtn 的按鈕，請檢查 HTML");
-            }
-
-            // 旋轉邏輯 (放在後面，避免影響上方按鈕綁定)
-            let isDragging = false;
-            function updateTimeFromAngle(deg) {
-                let normalizedDeg = (deg + 360) % 360;
-                if(knobRotator) knobRotator.style.transform = `rotate(${normalizedDeg}deg)`;
-                
-                const minTime = 1, maxTime = 180;
-                let totalMins = Math.round(minTime + (normalizedDeg / 360) * (maxTime - minTime));
-                
-                let hr = Math.floor(totalMins / 60);
-                let min = totalMins % 60;
-                
-                if(displayHr) {
-                    displayHr.innerText = hr;
-                    if(displayHr.parentElement) displayHr.parentElement.style.display = hr > 0 ? 'block' : 'none';
-                }
-                if(displayMin) displayMin.innerText = min;
-            }
-
-            function handleDrag(clientX, clientY) {
-                if(!timerArea) return;
-                const rect = timerArea.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                let rad = Math.atan2(clientY - centerY, clientX - centerX);
-                let deg = rad * (180 / Math.PI);
-                updateTimeFromAngle(deg - 90);
-            }
-
-            if(timerArea) {
-                timerArea.addEventListener('mousedown', (e) => { isDragging = true; handleDrag(e.clientX, e.clientY); });
-                window.addEventListener('mousemove', (e) => { if(isDragging) { e.preventDefault(); handleDrag(e.clientX, e.clientY); }});
-                window.addEventListener('mouseup', () => isDragging = false);
-                timerArea.addEventListener('touchstart', (e) => { isDragging = true; handleDrag(e.touches[0].clientX, e.touches[0].clientY); }, {passive:false});
-                window.addEventListener('touchmove', (e) => { if(isDragging) { e.preventDefault(); handleDrag(e.touches[0].clientX, e.touches[0].clientY); }}, {passive:false});
-                window.addEventListener('touchend', () => isDragging = false);
             }
         },
 
@@ -300,7 +471,21 @@ document.addEventListener('DOMContentLoaded', function() {
             function renderTeas(type) {
                 if(!teaGrid) return;
                 teaGrid.innerHTML = '';
-                const filtered = teaDatabase.filter(t => t.type === type);
+                // 這裡 type 對應到 teaDatabase 裡的 'type'
+                // 為了相容原本的按鈕 (white, green, black, dark)，可能需要調整 mapping
+                // 假設您的按鈕是: [白茶] [綠茶] [黃/紅/烏龍] 
+                // 這裡簡單處理：如果按鈕的 data-type 與 db 的 type 一致就顯示
+                
+                // 修正 filter 邏輯以符合新資料庫
+                // teaDatabase type: green, yellow, red
+                // HTML buttons data-type: white, green, black, dark (原本的)
+                // 建議修改 tea_cabinet.html 的按鈕 data-type 為: green, yellow, red
+                // 或者在這裡做 mapping:
+                
+                let dbType = type;
+                if (type === 'black') dbType = 'red'; // 對應紅色/紅茶按鈕
+
+                const filtered = teaDatabase.filter(t => t.type === dbType);
                 const owned = filtered.filter(t => t.owned).length;
                 if(progressDisplay) progressDisplay.innerText = `已累積 ${owned} / ${filtered.length} 種`;
 
@@ -311,8 +496,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 filtered.forEach(tea => {
                     const card = document.createElement('div');
                     card.className = tea.owned ? 'tea-card owned' : 'tea-card locked';
+                    
+                    // 取得圖片
+                    const imgSrc = teaImageMap[tea.name] || teaImageMap['default'];
+                    
+                    // 渲染卡片內容
+                    let iconHtml = '';
+                    if (tea.owned) {
+                        // 已擁有：顯示圖片
+                        iconHtml = `<img src="${imgSrc}" class="cabinet-tea-img">`;
+                    } else {
+                        // 未擁有：顯示鎖頭
+                        iconHtml = `<i class="fas fa-lock card-icon" style="font-size:40px; color:#333 transform:translateY(-5px);"></i>`;
+                    }
+
                     card.innerHTML = `
-                        <div class="card-top"><i class="${tea.owned ? 'far fa-leaf' : 'fas fa-lock'} card-icon" style="font-size:40px; color:${tea.owned?'#4CAF50':'#333'}"></i></div>
+                        <div class="card-top">${iconHtml}</div>
                         <div class="card-bottom"><div class="tea-name">${tea.name}</div></div>
                     `;
                     teaGrid.appendChild(card);
@@ -326,7 +525,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     renderTeas(btn.getAttribute('data-type'));
                 });
             });
-            renderTeas('black');
+            // 預設顯示綠茶
+            renderTeas('green');
         },
 
         costume: () => {
@@ -423,8 +623,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const session = data || { success: false, totalTime: 4800, remainingTime: 2400, checklist: ['無待辦事項'] };
             const resultMessageEl = document.getElementById('resultMessage');
             const checklistContainer = document.getElementById('resultChecklistItems');
-            const resultVideo = document.getElementById('resultVideo');
-            const resultImage = document.getElementById('resultImage');
+            const resultSuccessImage = document.getElementById('resultSuccessVideo');
+            const resultFailImage = document.getElementById('resultFailImage');
 
             const actualSeconds = session.totalTime - session.remainingTime;
             const hr = Math.floor(actualSeconds / 3600);
@@ -442,19 +642,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (session.success) {
-                if(resultMessageEl) resultMessageEl.innerHTML = `你已成功專注 ${timeStr} ！<br>恭喜獲得「紅茶」`;
-                if(resultImage) resultImage.style.display = 'none';
-                if(resultVideo) {
-                    resultVideo.style.display = 'block';
-                    resultVideo.play().catch(e => console.log("影片播放失敗", e));
+                if(resultMessageEl) resultMessageEl.innerHTML = `你已成功專注 ${timeStr} ！<br>恭喜獲得「綠茶」`;
+                if(resultFailImage) resultFailImage.style.display = 'none';
+                if(resultSuccessImage) {
+                    resultSuccessImage.style.display = 'block';
+                    resultSuccessImage.play().catch(e => console.log("影片播放失敗", e));
                 }
             } else {
-                if(resultMessageEl) resultMessageEl.innerHTML = `你專注了 ${timeStr}<br>但失去「紅茶」，再接再厲！`;
-                if(resultVideo) {
-                    resultVideo.style.display = 'none';
-                    resultVideo.pause();
+                if(resultMessageEl) resultMessageEl.innerHTML = `你專注了 ${timeStr}<br>但失去「文山包種茶」，再接再厲！`;
+                if(resultSuccessImage) {
+                    resultSuccessImage.style.display = 'none';
+                    resultSuccessImage.pause();
                 }
-                if(resultImage) resultImage.style.display = 'block';
+                if(resultFailImage) resultFailImage.style.display = 'block';
             }
         }
     };
