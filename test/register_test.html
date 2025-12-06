@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>註冊頁面預覽</title>
+    <!-- 引入 Font Awesome 用於圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS 部分 (請複製到您的 style.css) --- */
+        
+        /* 1. 全域設定 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+        }
+
+        /* 2. 註冊頁面容器與背景 */
+        .register-screen {
+            /* Linear 背景色: 白 -> #DDD7B6 (rgba(221, 215, 182, 1)) */
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(221, 215, 182, 1) 100%
+            );
+            width: 100%;
+            min-height: 100vh; /* 佔滿手機高度 */
+            display: flex;
+            flex-direction: column;
+            padding: 20px 30px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* 3. 頂部返回箭頭 (黑色 #000000) */
+        .register-header {
+            width: 100%;
+            padding-top: 20px;
+            margin-bottom: 20px; /* 距離標題的間距 */
+        }
+
+        .back-button-black {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #000000;  /* 需求顏色: 000000 */
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* 4. 標題 "註 冊" (顏色 #BEA587) */
+        .register-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #BEA587; /* 需求顏色: BEA587 */
+            text-align: center;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+        }
+
+        /* 5. 表單區域 */
+        .register-form {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px; /* 欄位之間的間距 */
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* 標籤樣式 (圖示 + 文字) */
+        .input-group label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #BEA587; /* 需求顏色: 字體 BEA587 */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 輸入框樣式 */
+        .styled-input {
+            width: 100%;
+            height: 60px;
+            background-color: #BEA587; /* 需求顏色: 輸入格背景 BEA587 */
+            border: none;
+            border-radius: 30px; /* 圓角 */
+            padding: 0 50px 0 20px; /* 右側留白給眼睛圖示 */
+            font-size: 18px;
+            color: #FFFFFF; /* 輸入文字為白色 */
+            outline: none;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 陰影 */
+            box-sizing: border-box;
+        }
+        
+        .styled-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 密碼區塊設定 (用於定位眼睛 icon) */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        /* 眼睛 Icon (共用 class) */
+        .toggle-password-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #FFFFFF;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* 6. 註冊按鈕 (底色 #F4B04B, 字體 #F2F3F5) */
+        .main-register-btn {
+            width: 160px;
+            height: 55px;
+            background-color: #F4B04B; /* 需求顏色: 按鈕底色 */
+            border-radius: 27.5px;
+            color: #F2F3F5; /* 需求顏色: 按鈕字體 */
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            letter-spacing: 2px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            display: block;
+            margin: 40px auto 0 auto; /* 上方留白，左右置中 */
+            transition: transform 0.1s;
+        }
+
+        .main-register-btn:active {
+            transform: scale(0.95);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HTML 結構 (請將此部分整合至您的 JS 動態載入變數中) -->
+    <div class="register-screen">
+        
+        <!-- 頂部返回按鈕 -->
+        <div class="register-header">
+            <!-- ID: registerBackBtn，用於 JS 綁定返回事件 -->
+            <button id="registerBackBtn" class="back-button-black">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- 標題 -->
+        <div class="register-title">註 冊</div>
+
+        <!-- 註冊表單 -->
+        <div class="register-form">
+            
+            <!-- 1. 帳號 -->
+            <div class="input-group">
+                <label for="reg-username">
+                    <i class="far fa-envelope"></i> 帳 號
+                </label>
+                <input type="text" id="reg-username" class="styled-input">
+            </div>
+
+            <!-- 2. 密碼 -->
+            <div class="input-group">
+                <label for="reg-password">
+                    <i class="fas fa-lock"></i> 密 碼
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="reg-password" class="styled-input">
+                    <!-- ID: toggleRegPwd -->
+                    <i class="far fa-eye toggle-password-icon" id="toggleRegPwd"></i>
+                </div>
+            </div>
+
+            <!-- 3. 確認密碼 -->
+            <div class="input-group">
+                <label for="reg-confirm-password">
+                    <i class="fas fa-lock"></i> 確認密碼
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="reg-confirm-password" class="styled-input">
+                    <!-- ID: toggleConfirmPwd -->
+                    <i class="far fa-eye toggle-password-icon" id="toggleConfirmPwd"></i>
+                </div>
+            </div>
+
+            <!-- 註冊按鈕 -->
+            <!-- ID: performRegisterBtn，用於 JS 綁定送出事件 -->
+            <button id="performRegisterBtn" class="main-register-btn">
+                註 冊
+            </button>
+
+        </div>
+    </div>
+
+    <!-- 
+       備註：因為您使用動態載入，JS 部分不需要寫在這裡。
+       但為了讓您在這個測試檔能看到「眼睛切換」的效果，
+       我加了一小段僅供預覽用的 Script。
+       正式整合時，請將類似邏輯寫在您的 script.js 中。
+    -->
+    <script>
+        // --- 僅供此測試檔預覽使用 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 模擬返回按鈕
+            document.getElementById('registerBackBtn').addEventListener('click', () => {
+                alert('點擊返回：回到首頁');
+            });
+
+            // 模擬註冊按鈕
+            document.getElementById('performRegisterBtn').addEventListener('click', () => {
+                alert('點擊註冊：後續將連接 Database');
+            });
+
+            // 輔助函式：切換密碼顯示
+            function setupPasswordToggle(toggleId, inputId) {
+                const toggleBtn = document.getElementById(toggleId);
+                const input = document.getElementById(inputId);
+                if (toggleBtn && input) {
+                    toggleBtn.addEventListener('click', () => {
+                        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                        input.setAttribute('type', type);
+                        toggleBtn.classList.toggle('fa-eye');
+                        toggleBtn.classList.toggle('fa-eye-slash');
+                    });
+                }
+            }
+
+            // 設定兩個密碼框的眼睛功能
+            setupPasswordToggle('toggleRegPwd', 'reg-password');
+            setupPasswordToggle('toggleConfirmPwd', 'reg-confirm-password');
+        });
+    </script>
+</body>
+</html>

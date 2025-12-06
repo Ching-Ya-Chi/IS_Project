@@ -1,0 +1,55 @@
+<div class="screen">
+    <div class="header">
+        <button class="back-btn">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="page-title">裝 扮 與 成 就</div>
+    </div>
+
+    <!-- 統計摘要 -->
+    <div class="summary-section">
+        <i class="fas fa-clipboard-check summary-icon"></i>
+        <div class="summary-text-group">
+            <div class="summary-count">11 / 68</div>
+            <div class="summary-label">已達成的成就總計</div>
+        </div>
+    </div>
+
+    <!-- Top 3 成就展示 -->
+    <div class="badge-container">
+        <div class="badge-card">
+            <div class="badge-img-circle"><img src="" class="badge-img"></div>
+            <div class="badge-name">OO高手</div>
+        </div>
+        <div class="badge-card">
+            <div class="badge-img-circle"><img src="" class="badge-img"></div>
+            <div class="badge-name">OO達人</div>
+        </div>
+        <div class="badge-card">
+            <div class="badge-img-circle"><img src="" class="badge-img"></div>
+            <div class="badge-name">OO專家</div>
+        </div>
+    </div>
+
+    <!-- 功能按鈕選單 -->
+    <!-- 修正：加入 data-page 與 data-arg，並使用 menu-btn-wide 樣式 -->
+    <div class="menu-container">
+        <button class="menu-btn" data-page="achievements" data-arg="unlocked">
+            <i class="far fa-eye btn-icon"></i>
+            <span class="btn-text">已 解 鎖</span>
+            <i class="fas fa-chevron-right btn-arrow"></i>
+        </button>
+
+        <button class="menu-btn" data-page="achievements" data-arg="locked">
+            <i class="far fa-eye-slash btn-icon"></i>
+            <span class="btn-text">未 解 鎖</span>
+            <i class="fas fa-chevron-right btn-arrow"></i>
+        </button>
+
+        <button class="menu-btn" data-page="costume">
+            <i class="fas fa-tshirt btn-icon"></i>
+            <span class="btn-text">裝 扮</span>
+            <i class="fas fa-chevron-right btn-arrow"></i>
+        </button>
+    </div>
+</div>

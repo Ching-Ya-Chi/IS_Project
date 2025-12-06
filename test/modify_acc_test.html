@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>修改帳號預覽</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS 部分 --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #333; /* 瀏覽器背景深色 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .screen {
+            width: 393px;
+            height: 852px;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(221, 215, 182, 1) 100%
+            );
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            padding: 20px 30px;
+        }
+
+        /* --- Header --- */
+        .header {
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 60px; /* 距離下方標題的距離 */
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #000000;
+            cursor: pointer;
+            padding: 10px 0;
+        }
+
+        /* 頁面大標題 */
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #BEA587;
+            letter-spacing: 4px;
+            margin-bottom: 60px;
+        }
+
+        /* --- Form --- */
+        .form-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-group label {
+            font-size: 20px;
+            font-weight: bold;
+            color: #BEA587;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .styled-input {
+            width: 100%;
+            height: 60px;
+            background-color: #BEA587;
+            border: none;
+            border-radius: 30px;
+            padding: 0 50px 0 20px; /* 右側留白給 Icon */
+            font-size: 18px;
+            color: #FFFFFF;
+            outline: none;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        /* 鉛筆 Icon */
+        .input-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #FFFFFF;
+            font-size: 18px;
+            pointer-events: none; /* 讓點擊穿透到 input */
+        }
+
+        /* --- Button --- */
+        .confirm-btn {
+            width: 160px;
+            height: 55px;
+            background-color: #F4B04B;
+            border-radius: 27.5px;
+            color: #F2F3F5;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            letter-spacing: 4px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            margin: 80px auto 0 auto; /* 與上方表單的距離 */
+            display: block;
+            transition: transform 0.1s;
+        }
+
+        .confirm-btn:active {
+            transform: scale(0.95);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="screen">
+        <!-- Header: 返回箭頭 -->
+        <div class="header">
+            <button class="back-btn" id="accBackBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- 標題 -->
+        <div class="page-title">修 改 帳 號</div>
+
+        <!-- 表單 -->
+        <div class="form-container">
+            <div class="input-group">
+                <label>
+                    <i class="far fa-envelope"></i> 帳 號
+                </label>
+                <div class="input-wrapper">
+                    <input type="text" class="styled-input" id="newAccountInput">
+                    <!-- 右側鉛筆 Icon -->
+                    <i class="fas fa-pen input-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 確認按鈕 -->
+        <button class="confirm-btn" id="accConfirmBtn">
+            確 認
+        </button>
+    </div>
+
+    <script>
+        // 測試用 JS
+        document.getElementById('accBackBtn').addEventListener('click', () => {
+            console.log("返回上一頁");
+        });
+        document.getElementById('accConfirmBtn').addEventListener('click', () => {
+            console.log("確認修改帳號");
+        });
+    </script>
+</body>
+</html>

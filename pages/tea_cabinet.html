@@ -1,20 +1,30 @@
-<div class="tea-cabinet-page-container">
-    <header class="tea-cabinet-header">
-        <button class="back-button">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="tea-cabinet-title">茶櫃</div>
-    </header>
-    <div class="tea-cabinet-content">
-        <div class="tea-item-block" data-tea-category="red_tea">
-            <img src="./img/red_tea.png" alt="red_tea">
-        </div> <!-- 可以放文字或圖片 -->
-        <div class="tea-item-block" data-tea-category="green_tea">
-            <img src="./img/oolong_tea.png" alt="white_tea">
+
+    <div class="screen">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" id="cabinetBackBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="page-title">茶 櫃</div>
         </div>
-        <div class="tea-item-block" data-tea-category="yellow_tea">
-            <img src="./img/yellow_tea.png" alt="yellow_tea">
+
+        <!-- Filter Buttons -->
+        <div class="filter-container">
+            <button class="filter-btn" data-type="white">白 茶</button>
+            <button class="filter-btn" data-type="green">綠 茶</button>
+            <button class="filter-btn active" data-type="black">紅 茶</button>
+            <button class="filter-btn" data-type="dark">黑 茶</button>
         </div>
-        <!-- 確保至少有這麼多個 block 來觸發彈出視窗 -->
+
+        <!-- Progress Text -->
+        <div class="progress-text" id="progressDisplay">
+            已累積 0 / 0 種
+        </div>
+
+        <!-- Scrollable Grid Area -->
+        <div class="grid-scroll-area">
+            <div class="tea-grid" id="teaGrid">
+                <!-- Javascript 將動態插入內容 -->
+            </div>
+        </div>
     </div>
-</div>

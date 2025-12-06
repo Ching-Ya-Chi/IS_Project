@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>修改密碼預覽</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS 部分 (與上方共用基礎樣式) --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .screen {
+            width: 393px;
+            height: 852px;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(221, 215, 182, 1) 100%
+            );
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            padding: 20px 30px;
+        }
+
+        /* --- Header --- */
+        .header {
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #000000;
+            cursor: pointer;
+            padding: 10px 0;
+        }
+
+        /* 標題 */
+        .page-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #BEA587;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+        }
+
+        /* --- Form --- */
+        .form-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-group label {
+            font-size: 20px;
+            font-weight: bold;
+            color: #BEA587;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .styled-input {
+            width: 100%;
+            height: 60px;
+            background-color: #BEA587;
+            border: none;
+            border-radius: 30px;
+            padding: 0 50px 0 20px;
+            font-size: 18px;
+            color: #FFFFFF;
+            outline: none;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        /* 眼睛 Icon */
+        .toggle-password {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #FFFFFF;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* --- Button --- */
+        .confirm-btn {
+            width: 160px;
+            height: 55px;
+            background-color: #F4B04B;
+            border-radius: 27.5px;
+            color: #F2F3F5;
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            letter-spacing: 4px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            margin: 60px auto 0 auto;
+            display: block;
+            transition: transform 0.1s;
+        }
+
+        .confirm-btn:active {
+            transform: scale(0.95);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="screen">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" id="pwBackBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- 標題 -->
+        <div class="page-title">修 改 密 碼</div>
+
+        <!-- 表單 -->
+        <div class="form-container">
+            
+            <!-- 1. 舊密碼 (依照截圖，label icon 是信封) -->
+            <div class="input-group">
+                <label>
+                    <i class="far fa-envelope"></i> 舊 密 碼
+                </label>
+                <div class="input-wrapper">
+                    <input type="password" class="styled-input" id="oldPassword">
+                    <!-- 截圖中舊密碼沒有眼睛，若需要可自行添加 -->
+                </div>
+            </div>
+
+            <!-- 2. 新密碼 (label icon 是鎖頭，有眼睛) -->
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-lock"></i> 新 密 碼
+                </label>
+                <div class="input-wrapper">
+                    <input type="password" class="styled-input" id="newPassword">
+                    <i class="far fa-eye toggle-password" id="toggleNewPw"></i>
+                </div>
+            </div>
+
+            <!-- 3. 確認新密碼 (label icon 是鎖頭，有眼睛) -->
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-lock"></i> 確認新密碼
+                </label>
+                <div class="input-wrapper">
+                    <input type="password" class="styled-input" id="confirmNewPassword">
+                    <i class="far fa-eye toggle-password" id="toggleConfirmPw"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 確認按鈕 -->
+        <button class="confirm-btn" id="pwConfirmBtn">
+            確 認
+        </button>
+    </div>
+
+    <script>
+        // --- 測試用 JS ---
+
+        // 1. 眼睛切換函式
+        function setupToggle(toggleId, inputId) {
+            const toggle = document.getElementById(toggleId);
+            const input = document.getElementById(inputId);
+            if(toggle && input){
+                toggle.addEventListener('click', () => {
+                    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                    input.setAttribute('type', type);
+                    toggle.classList.toggle('fa-eye');
+                    toggle.classList.toggle('fa-eye-slash');
+                });
+            }
+        }
+
+        setupToggle('toggleNewPw', 'newPassword');
+        setupToggle('toggleConfirmPw', 'confirmNewPassword');
+
+        // 2. 按鈕事件
+        document.getElementById('pwBackBtn').addEventListener('click', () => console.log('返回'));
+        document.getElementById('pwConfirmBtn').addEventListener('click', () => console.log('確認修改密碼'));
+
+    </script>
+</body>
+</html>

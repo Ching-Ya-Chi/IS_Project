@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>茶櫃</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- 全域設定 --- */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #333;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .screen {
+            width: 393px; height: 852px;
+            /* 背景漸層 */
+            background: linear-gradient(180deg, #FFFFFF 0%, #EAE5CE 100%);
+            position: relative;
+            box-sizing: border-box; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+        }
+
+        /* --- Header --- */
+        .header {
+            width: 100%; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-top: 20px; flex-shrink: 0;
+        }
+
+        .back-btn {
+            position: absolute; left: 20px;
+            background: none; border: none; font-size: 28px; color: #000;
+            cursor: pointer; padding: 10px;
+        }
+
+        .page-title {
+            font-size: 24px; font-weight: bold; color: #000; letter-spacing: 2px;
+        }
+
+        /* --- Filter Tabs (四個分類按鈕) --- */
+        .filter-container {
+            display: flex; justify-content: space-between;
+            padding: 0 20px; margin-top: 20px;
+        }
+
+        .filter-btn {
+            width: 80px; height: 45px;
+            border-radius: 10px; border: none;
+            font-size: 16px; font-weight: bold; letter-spacing: 2px;
+            cursor: pointer;
+            background-color: #F4B04B; /* 預設橘色 */
+            color: #000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+
+        /* 選中狀態 (參考附圖紅茶按鈕的亮黃色) */
+        .filter-btn.active {
+            background-color: #FFEE58; 
+        }
+
+        /* --- 進度顯示 --- */
+        .progress-text {
+            text-align: right; padding-right: 25px;
+            margin-top: 15px; margin-bottom: 10px;
+            font-size: 14px; font-weight: bold; color: #000;
+            letter-spacing: 1px;
+        }
+
+        /* --- 網格內容區 (Scrollable) --- */
+        .grid-scroll-area {
+            flex: 1; /* 佔滿剩餘空間 */
+            overflow-y: auto; /* 可捲動 */
+            padding: 10px 20px 40px 20px; /* 底部留白 */
+        }
+
+        /* 隱藏捲軸美觀 */
+        .grid-scroll-area::-webkit-scrollbar { width: 0; }
+
+        .tea-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 兩欄 */
+            gap: 20px; /* 卡片間距 */
+        }
+
+        /* --- 卡片樣式 --- */
+        .tea-card {
+            background-color: transparent;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* 卡片上半部 (圖片/圖示區) */
+        .card-top {
+            height: 110px;
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+        
+        /* 已獲得的背景色 (淺灰) */
+        .tea-card.owned .card-top { background-color: #E0E0E0; }
+        /* 未獲得的背景色 (深灰) */
+        .tea-card.locked .card-top { background-color: #9E9E9E; }
+
+        /* 卡片下半部 (文字區) */
+        .card-bottom {
+            height: 60px;
+            background-color: #F4B04B; /* 統一橘色底 */
+            display: flex; justify-content: center; align-items: center;
+            text-align: center;
+            padding: 0 5px;
+        }
+
+        .tea-name {
+            font-size: 16px; font-weight: bold; color: #000; line-height: 1.2;
+        }
+        
+        .locked-text {
+            font-size: 14px; font-weight: bold; color: #000; line-height: 1.4;
+        }
+
+        /* icon 樣式 */
+        .card-icon {
+            font-size: 50px;
+            color: #4CAF50; /* 葉子綠色 */
+            stroke: #000; stroke-width: 1px; /* 若是用SVG可加邊框，FontAwesome模擬即可 */
+        }
+        
+        /* 鎖頭樣式 */
+        .lock-icon {
+            font-size: 50px;
+            color: #333; /* 鎖頭深色 */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="screen">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" id="cabinetBackBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="page-title">茶 櫃</div>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="filter-container">
+            <button class="filter-btn" data-type="white">白 茶</button>
+            <button class="filter-btn" data-type="green">綠 茶</button>
+            <button class="filter-btn active" data-type="black">紅 茶</button>
+            <button class="filter-btn" data-type="dark">黑 茶</button>
+        </div>
+
+        <!-- Progress Text -->
+        <div class="progress-text" id="progressDisplay">
+            已累積 0 / 0 種
+        </div>
+
+        <!-- Scrollable Grid Area -->
+        <div class="grid-scroll-area">
+            <div class="tea-grid" id="teaGrid">
+                <!-- Javascript 將動態插入內容 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 假資料庫 (Mock DB) ---
+        // 模擬後端回傳的 JSON 資料
+        // img: 預留圖片路徑，若無則使用 font-awesome icon
+        const teaDatabase = [
+            // 紅茶類 (Black Tea) - 模擬附圖
+            { id: 1, type: 'black', name: '日月潭紅玉', owned: true, img: '' },
+            { id: 2, type: 'black', name: '蜜香紅茶', owned: true, img: '' },
+            { id: 3, type: 'black', name: '阿薩姆紅茶', owned: true, img: '' },
+            { id: 4, type: 'black', name: '錫蘭紅茶', owned: false, img: '' }, // 未解鎖
+            { id: 5, type: 'black', name: '大吉嶺', owned: false, img: '' },   // 未解鎖
+            { id: 6, type: 'black', name: '伯爵茶', owned: true, img: '' },
+
+            // 綠茶類 (Green Tea)
+            { id: 11, type: 'green', name: '碧螺春', owned: true, img: '' },
+            { id: 12, type: 'green', name: '龍井', owned: false, img: '' },
+            { id: 13, type: 'green', name: '抹茶', owned: true, img: '' },
+
+            // 白茶類 (White Tea)
+            { id: 21, type: 'white', name: '白毫銀針', owned: false, img: '' },
+            { id: 22, type: 'white', name: '白牡丹', owned: false, img: '' },
+
+            // 黑茶類 (Dark Tea)
+            { id: 31, type: 'dark', name: '普洱茶', owned: true, img: '' },
+        ];
+
+        // --- 2. DOM 元素 ---
+        const teaGrid = document.getElementById('teaGrid');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        // --- 3. 渲染函式 ---
+        function renderTeas(selectedType) {
+            // A. 清空現有內容
+            teaGrid.innerHTML = '';
+
+            // B. 過濾資料
+            const filteredTeas = teaDatabase.filter(tea => tea.type === selectedType);
+
+            // C. 計算進度
+            const total = filteredTeas.length;
+            const ownedCount = filteredTeas.filter(tea => tea.owned).length;
+            progressDisplay.innerText = `已累積 ${ownedCount} / ${total} 種`;
+
+            // D. 生成 HTML
+            if (total === 0) {
+                teaGrid.innerHTML = '<div style="grid-column: span 2; text-align:center; color:#999; margin-top:50px;">此分類暫無茶葉</div>';
+                return;
+            }
+
+            filteredTeas.forEach(tea => {
+                const card = document.createElement('div');
+                
+                if (tea.owned) {
+                    // --- 已獲得樣式 ---
+                    card.className = 'tea-card owned';
+                    card.innerHTML = `
+                        <div class="card-top">
+                            <!-- 若有真實圖片，可將 i 換成 img src="..." -->
+                            <i class="far fa-leaf card-icon"></i> 
+                        </div>
+                        <div class="card-bottom">
+                            <div class="tea-name">${tea.name}</div>
+                        </div>
+                    `;
+                } else {
+                    // --- 未獲得樣式 ---
+                    card.className = 'tea-card locked';
+                    card.innerHTML = `
+                        <div class="card-top">
+                            <i class="fas fa-lock lock-icon"></i>
+                        </div>
+                        <div class="card-bottom">
+                            <div class="locked-text">? ? ? ? ?<br><span style="font-size:12px">待付費解鎖</span></div>
+                        </div>
+                    `;
+                }
+                teaGrid.appendChild(card);
+            });
+        }
+
+        // --- 4. 事件監聽 ---
+        
+        // 分類按鈕點擊
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 移除所有 active
+                filterBtns.forEach(b => b.classList.remove('active'));
+                // 設為 active
+                btn.classList.add('active');
+                
+                // 取得類別並渲染
+                const type = btn.getAttribute('data-type');
+                renderTeas(type);
+            });
+        });
+
+        // 返回按鈕
+        document.getElementById('cabinetBackBtn').addEventListener('click', () => {
+            console.log("返回首頁");
+        });
+
+        // --- 5. 初始化 ---
+        // 預設顯示 "紅茶" (black)
+        renderTeas('black');
+
+    </script>
+</body>
+</html>

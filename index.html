@@ -2,78 +2,21 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>茶園專注應用</title>
+    <!-- 引入 Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 引入合併後的樣式 -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="phone-frame">
-        <div class="phone-screen">
-            <div class="dynamic-island"></div>
-            <div id="popup-overlay" class="popup-overlay"></div> <!-- 遮罩層 -->
-
-            <!-- 主要內容區域，用於動態載入各頁面內容 -->
-            <div id="main-content-area">
-                <!-- 頁面內容將載入到這裡 -->
-            </div>
-
-            <!-- 茶園選擇彈出視窗 (Popup Window) -->
-            <div class="page tea-garden-selection-page" id="tea-garden-selection-popup-page">
-                <header class="selection-header">
-                    <button id="closeTeaGardenSelectionPopup" class="back-button" data-action="close-popup">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div class="selection-title">金城茶園</div>
-                </header>
-                <div class="selection-content">
-                    <div class="tea-type-circle">
-                        <img id="teaGardenImage" src="" alt="Tea Type Image"> <!-- 新增：用於顯示圖片的img標籤 -->
-                    </div>
-                    <!-- 新增：滑桿容器，用於調整時間並顯示分鐘數 -->
-                    <div class="time-slider-container">
-                        <label for="timeSlider">設定專注時間:</label>
-                        <input type="range" id="timeSlider" min="1" max="180" value="30" class="focus-duration-slider">
-                        <span id="sliderTimeDisplay">30 分鐘</span>
-                    </div>
-                    <!-- 保持原有的 input[type="time"] 但設為隱藏，其值將由滑桿更新，以確保原有按鈕邏輯不受影響 -->
-                    <div class="focus-time-display" style="display: none;">
-                        <span>預計專注時間 </span><input type="time" class="time-input" value="00:00">
-                    </div>
-                    <div class="action-buttons">
-                        <button class="action-button personal-start" data-action="start-personal-focus">個人開始</button>
-                        <button class="action-button friend-start" data-action="open-friend-focus-settings">好友開始</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 好友專注設定彈出視窗 -->
-            <div class="page friend-focus-settings-page" id="friend-focus-settings-popup-page">
-                <!-- 內容將由 script.js 動態載入 -->
-            </div>
-
-            <!-- 專注完成彈出視窗 -->
-            <div class="page focus-completion-page" id="focus-completion-popup-page">
-                <!-- 內容將由 script.js 動態載入 -->
-            </div>
-
-            <!-- 中途終止彈出視窗 -->
-            <div class="page focus-early-termination-page" id="focus-early-termination-popup-page">
-                <!-- 內容將由 script.js 動態載入 -->
-            </div>
-
-            <!-- 裝扮選擇彈出視窗 (新加入) -->
-            <div class="page decoration-selection-page" id="decoration-selection-popup-page">
-                <!-- 內容將由 script.js 動態載入 -->
-            </div>
-
-            <!-- 茶葉收藏彈出視窗 (新加入) -->
-            <div class="page tea-collection-popup-page" id="tea-collection-popup-page">
-                <!-- 內容將由 script.js 動態載入 -->
-            </div>
-
-        </div>
+    <!-- 這裡模擬手機外框 (如果需要) 或直接顯示內容 -->
+    <!-- 為了配合你的設計，這裡直接作為容器 -->
+    <div id="app-container">
+        <div id="main-content-area"></div>
     </div>
+
+    <!-- 引入合併後的邏輯 -->
     <script src="script.js"></script>
 </body>
 </html>

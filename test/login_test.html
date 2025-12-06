@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>登入頁面預覽</title>
+    <!-- 引入 Font Awesome 用於圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS 部分 (稍後可移至 style.css) --- */
+        
+        /* 1. 全域與背景設定 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+        }
+
+        .login-screen {
+            /* Linear 背景色: 白 -> #DDD7B6 (rgba(221, 215, 182, 1)) */
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(221, 215, 182, 1) 100%
+            );
+            width: 100%;
+            min-height: 100vh; /* 佔滿手機高度 */
+            display: flex;
+            flex-direction: column;
+            padding: 20px 30px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* 2. 頂部返回箭頭 (黑色 #000000) */
+        .login-header {
+            width: 100%;
+            padding-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .back-button-black {
+            background: none;
+            border: none;
+            font-size: 28px; /* 圖示大小 */
+            color: #000000;  /* 需求顏色: 000000 */
+            cursor: pointer;
+            padding: 0;
+        }
+
+        /* 3. 標題 "登 入" (顏色 #BEA587) */
+        .login-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #BEA587; /* 需求顏色: BEA587 */
+            text-align: center;
+            margin-bottom: 50px;
+            letter-spacing: 4px;
+        }
+
+        /* 4. 表單區域 */
+        .login-form {
+            width: 100%;
+            max-width: 400px; /* 限制在大螢幕上的寬度 */
+            margin: 0 auto;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* 標籤樣式 (圖示 + 文字) */
+        .input-group label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #BEA587; /* 需求顏色: 字體 BEA587 */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 輸入框樣式 */
+        .styled-input {
+            width: 100%;
+            height: 60px; /* 較高的輸入框，如附圖 */
+            background-color: #BEA587; /* 需求顏色: 輸入格 BEA587 */
+            border: none;
+            border-radius: 30px; /* 圓角 */
+            padding: 0 50px 0 20px; /* 右側留白給眼睛圖示 */
+            font-size: 18px;
+            color: #FFFFFF; /* 輸入格內文字設為白色，對比才清楚 */
+            outline: none;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 陰影 */
+            box-sizing: border-box;
+        }
+        
+        /* 讓 placeholder 顏色稍微淺一點，或者也是白色 */
+        .styled-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 密碼區塊設定 */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        /* 眼睛 Icon (位於輸入框內右側) */
+        #togglePassword {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #FFFFFF;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* 忘記密碼 */
+        .forgot-password {
+            margin-top: -10px;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .forgot-password a {
+            color: #BEA587;
+            text-decoration: underline;
+            font-size: 14px;
+        }
+
+        /* 5. 登入按鈕 (底色 #F4B04B, 字體 #F2F3F5) */
+        .main-login-btn {
+            width: 160px;
+            height: 55px;
+            background-color: #F4B04B; /* 需求顏色: 按鈕底色 */
+            border-radius: 27.5px;
+            color: #F2F3F5; /* 需求顏色: 按鈕字體 */
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            letter-spacing: 2px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            display: block;
+            margin: 0 auto 30px auto; /* 置中 */
+            transition: transform 0.1s;
+        }
+
+        .main-login-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 6. 註冊連結 */
+        .register-link {
+            text-align: center;
+            color: #BEA587;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .register-link a {
+            color: #BEA587;
+            text-decoration: underline;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HTML 結構 (稍後放入 index.html 的 main-content-area 或動態載入) -->
+    <div class="login-screen">
+        <!-- 頂部導航 -->
+        <div class="login-header">
+            <!-- 返回箭頭 ID: loginBackBtn -->
+            <button id="loginBackBtn" class="back-button-black">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- 標題 -->
+        <div class="login-title">登 入</div>
+
+        <!-- 表單區域 -->
+        <div class="login-form">
+            <!-- 帳號欄位 -->
+            <div class="input-group">
+                <label for="login-username">
+                    <i class="far fa-envelope"></i> 帳 號
+                </label>
+                <input type="text" id="login-username" class="styled-input">
+            </div>
+
+            <!-- 密碼欄位 -->
+            <div class="input-group">
+                <label for="login-password">
+                    <i class="fas fa-lock"></i> 密 碼
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="login-password" class="styled-input">
+                    <!-- 眼睛開關 ID: togglePassword -->
+                    <i class="far fa-eye" id="togglePassword"></i>
+                </div>
+            </div>
+
+            <!-- 忘記密碼連結 -->
+            <div class="forgot-password">
+                <a href="#">忘記密碼 ?</a>
+            </div>
+
+            <!-- 登入按鈕 -->
+            <button id="performLoginBtn" class="main-login-btn">
+                登 入
+            </button>
+
+            <!-- 註冊連結 -->
+            <div class="register-link">
+                還沒有帳號 ? <a id="goToRegister">註冊</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- JS 部分 (稍後移至 script.js) ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. 箭頭 icon 點擊後回到首頁
+            const backBtn = document.getElementById('loginBackBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
+                    // 在測試檔中，我們用 alert 代表
+                    // 在正式環境請改為: window.location.href = 'index.html'; 或隱藏此 div
+                    alert("返回首頁 (邏輯尚未連接 index.html)");
+                });
+            }
+
+            // 2. 密碼顯示/隱藏切換
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('login-password');
+
+            if (togglePasswordBtn && passwordInput) {
+                togglePasswordBtn.addEventListener('click', () => {
+                    // 切換 type
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    // 切換 icon (實心眼/斜線眼)
+                    togglePasswordBtn.classList.toggle('fa-eye');
+                    togglePasswordBtn.classList.toggle('fa-eye-slash');
+                });
+            }
+
+            // 3. 登入按鈕
+            const loginBtn = document.getElementById('performLoginBtn');
+            if(loginBtn){
+                loginBtn.addEventListener('click', () => {
+                    const user = document.getElementById('login-username').value;
+                    alert(`嘗試登入帳號: ${user}\n(此處將連接後端 DB)`);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>地圖選擇與茶園設定</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- 基礎設定 --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none; /* 防止拖曳時選取文字 */
+        }
+
+        .map-screen {
+            width: 393px;
+            height: 852px;
+            background-color: #f0f0f0;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 地圖背景與按鈕 (原樣式) --- */
+        .map-background {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: 0;
+        }
+
+        .back-btn-container {
+            position: absolute; top: 20px; left: 20px; z-index: 10;
+        }
+        .back-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none; border-radius: 50%; width: 45px; height: 45px;
+            font-size: 24px; color: #000; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .user-avatar-container {
+            position: absolute; top: 20px; right: 20px;
+            width: 50px; height: 50px; border-radius: 50%;
+            background-color: #8BC34A; border: 2px solid #FFF;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            overflow: hidden; cursor: pointer; z-index: 10;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .user-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 地點按鈕 */
+        .location-btn {
+            position: absolute; width: 110px; height: 110px;
+            border-radius: 50%; background-color: rgba(217, 217, 217, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 5;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        .location-btn:active { transform: scale(0.95); }
+        .btn-label { font-size: 48px; color: #000; z-index: 2; }
+        .pos-a { top: 32%; left: 8%; }
+        .pos-b { top: 40%; right: 8%; }
+        .pos-c { top: 50%; left: 12%; }
+        .pos-d { top: 60%; right: 12%; }
+
+
+        /* --- 互動視窗 (Modal) 樣式 --- */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* 半透明背景 */
+            backdrop-filter: blur(2px);
+            z-index: 20;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; /* 預設隱藏 */
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1; pointer-events: auto;
+        }
+
+        .modal-card {
+            width: 340px;
+            background-color: #F2F3F5;
+            border-radius: 30px;
+            padding: 25px 20px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; align-items: center;
+            transform: scale(0.9); transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-card { transform: scale(1); }
+
+        /* 標題區 */
+        .modal-title {
+            font-size: 24px; font-weight: bold; color: #F4B04B; margin-bottom: 8px;
+        }
+        .modal-desc {
+            font-size: 12px; color: #999; text-align: center;
+            line-height: 1.4; margin-bottom: 20px; padding: 0 10px;
+        }
+
+        /* --- 環形計時器 (Circular Slider) --- */
+        .timer-wrapper {
+            position: relative;
+            width: 240px; height: 240px;
+            margin-bottom: 20px;
+            border-radius: 20px; overflow: hidden; /* 讓背景圖圓角 */
+            display: flex; justify-content: center; align-items: center;
+            /* 背景圖片 (預留) */
+            background-image: url('https://placehold.co/240x240/ddd/999?text=Tea+Field');
+            background-size: cover; background-position: center;
+        }
+
+        /* 計時器遮罩圓圈 */
+        .timer-circle {
+            position: relative;
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            background-color: rgba(255, 239, 213, 0.85); /* 米黃色半透明 */
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        /* 時間文字 */
+        .timer-text {
+            color: #C19A6B; /* 褐色文字 */
+            font-weight: bold;
+            text-align: center;
+            z-index: 2;
+        }
+        .timer-val { font-size: 48px; line-height: 1; }
+        .timer-unit { font-size: 24px; }
+        
+        /* 操縱桿旋轉容器 */
+        .knob-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+            pointer-events: none; /* 讓點擊穿透去觸發父層的 drag */
+        }
+
+        /* 實心圓點 (操縱桿) */
+        .knob {
+            position: absolute;
+            bottom: -10px; /* 距離圓心底部的距離 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px; height: 25px;
+            background-color: #F4B04B;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            pointer-events: auto; /* 恢復可點擊 */
+            cursor: grab;
+        }
+
+        /* --- 茶種區塊 --- */
+        .tea-section-title {
+            font-size: 14px; color: #8B5E3C; margin-bottom: 10px; align-self: flex-start; margin-left: 10px;
+        }
+        
+        .tea-dots-container {
+            display: flex; gap: 10px;
+            background-color: #fff;
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 1px solid #ddd;
+            width: 100%; box-sizing: border-box;
+            justify-content: space-around;
+            margin-bottom: 15px;
+        }
+        .tea-dot {
+            width: 20px; height: 20px; border-radius: 50%;
+            background-color: #ddd; /* 預設灰 */
+        }
+        .tea-dot.active { background-color: #F4B04B; } /* 有獲得的茶種 */
+
+        /* --- 輸入框 --- */
+        .goal-input {
+            width: 100%; height: 45px;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 0 15px;
+            font-size: 14px;
+            color: #555;
+            background-color: #f9f9f9;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        /* --- 進入按鈕 --- */
+        .enter-btn {
+            width: 100%; height: 55px;
+            background-color: #F4B04B;
+            border-radius: 27.5px;
+            border: none;
+            color: #fff; font-size: 22px; font-weight: bold; letter-spacing: 4px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .enter-btn:active { transform: scale(0.98); }
+
+    </style>
+</head>
+<body>
+
+    <div class="map-screen">
+        
+        <!-- 背景地圖 (請輸入圖片路徑) -->
+        <img src="../img/newImage/map.png" class="map-background">
+
+        <!-- Header Buttons -->
+        <div class="back-btn-container">
+            <button class="back-btn" id="mapBackBtn"><i class="fas fa-chevron-left"></i></button>
+        </div>
+        <div class="user-avatar-container">
+            <img src="https://placehold.co/100x100/4CAF50/white?text=User" class="user-avatar-img">
+        </div>
+
+        <!-- 4個地點按鈕 -->
+        <div class="location-btn pos-a" data-id="A" data-title="1792 茶園"><span class="btn-label">A</span></div>
+        <div class="location-btn pos-b" data-id="B" data-title="金城茶園"><span class="btn-label">B</span></div>
+        <div class="location-btn pos-c" data-id="C" data-title="深坑有好茶園"><span class="btn-label">C</span></div>
+        <div class="location-btn pos-d" data-id="D" data-title="來深坑喝茶園"><span class="btn-label">D</span></div>
+
+        <!-- === 互動視窗 (Modal) === -->
+        <div class="modal-overlay" id="teaModal">
+            <div class="modal-card">
+                <!-- 標題與敘述 -->
+                <div class="modal-title" id="modalTitle">茶園標題</div>
+                <div class="modal-desc">
+                    這裡是一段關於該茶園的簡短描述，介紹特色與環境。<br>
+                    ru03ruk3ndklndlkcndkncdknd...
+                </div>
+
+                <!-- 環形計時器 -->
+                <div class="timer-wrapper" id="timerArea">
+                    <div class="timer-circle">
+                        <div class="timer-text">
+                            <div><span class="timer-val" id="displayHr">1</span> <span class="timer-unit">hr</span></div>
+                            <div><span class="timer-val" id="displayMin">20</span> <span class="timer-unit">mins</span></div>
+                        </div>
+                        <!-- 旋轉的操縱桿容器 -->
+                        <div class="knob-container" id="knobRotator">
+                            <div class="knob"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 茶種區塊 -->
+                <div class="tea-section-title">可能獲得的茶種</div>
+                <div class="tea-dots-container">
+                    <div class="tea-dot"></div>
+                    <div class="tea-dot active"></div>
+                    <div class="tea-dot"></div>
+                    <div class="tea-dot"></div>
+                    <div class="tea-dot active"></div>
+                    <div class="tea-dot"></div>
+                    <div class="tea-dot active"></div>
+                </div>
+
+                <!-- 輸入框 -->
+                <input type="text" class="goal-input" placeholder="設定專注目標 (選填)">
+
+                <!-- 按鈕 -->
+                <button class="enter-btn">進 入 茶 園</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 變數與設定 ---
+        const modal = document.getElementById('teaModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const timerArea = document.getElementById('timerArea');
+        const knobRotator = document.getElementById('knobRotator');
+        const displayHr = document.getElementById('displayHr');
+        const displayMin = document.getElementById('displayMin');
+        
+        let isDragging = false;
+
+        // --- 1. Modal 開關邏輯 ---
+        
+        // 點擊地點按鈕開啟 Modal
+        document.querySelectorAll('.location-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 防止冒泡
+                const title = btn.getAttribute('data-title');
+                
+                // 更新內容
+                modalTitle.innerText = title;
+                // 重置時間為預設值 (例如 80 分鐘)
+                updateTimeFromAngle(180); 
+                
+                // 顯示
+                modal.classList.add('active');
+            });
+        });
+
+        // 點擊遮罩關閉 Modal (Requirement 1)
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // --- 2. 環形計時器邏輯 (Requirement 2) ---
+
+        // 將角度轉換為時間並更新 UI
+        // 我們定義: 0度(最上方) = 最小值(10min), 360度 = 最大值(180min)
+        function updateTimeFromAngle(degree) {
+            // 修正角度：讓 0 度在正下方開始算(配合 css rotate)，這裡將邏輯調整為直覺操作
+            // 我們讓 Knob 在 CSS 中是 bottom: 15px (正下方)。
+            // 所以 CSS rotate(0deg) 指向 6點鐘方向。
+            // 我們定義：6點鐘方向為起點(10min)，順時針轉一圈回到起點(180min)。
+            
+            // 確保角度在 0~360
+            let normalizedDeg = (degree + 360) % 360; 
+            
+            // 設定旋轉樣式
+            knobRotator.style.transform = `rotate(${normalizedDeg}deg)`;
+
+            // 計算時間 (10 min ~ 180 min)
+            // 比例 = normalizedDeg / 360
+            const minTime = 10;
+            const maxTime = 180;
+            const range = maxTime - minTime;
+            
+            let totalMins = Math.round(minTime + (normalizedDeg / 360) * range);
+            
+            // 格式化顯示
+            let hr = Math.floor(totalMins / 60);
+            let min = totalMins % 60;
+
+            // 如果時間很短，小時顯示 0 或隱藏? 附圖是 1hr 20mins，這裡保留 0 hr
+            if(hr > 0) {
+                displayHr.style.display = 'inline';
+                displayHr.innerText = hr;
+                displayHr.nextElementSibling.style.display = 'inline'; // "hr"
+            } else {
+                // 也可以選擇隱藏 hr
+                displayHr.style.display = 'none';
+                displayHr.nextElementSibling.style.display = 'none';
+            }
+            
+            displayMin.innerText = min;
+        }
+
+        // 處理拖曳計算
+        function handleDrag(clientX, clientY) {
+            const rect = timerArea.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const x = clientX - centerX;
+            const y = clientY - centerY;
+
+            // 計算角度 (radians)
+            // Math.atan2(y, x) 回傳 -PI ~ PI
+            // 0 是 3點鐘方向, PI/2 是 6點鐘, -PI/2 是 12點鐘
+            let rad = Math.atan2(y, x);
+            let deg = rad * (180 / Math.PI);
+
+            // 轉換座標系以符合 CSS (0度在6點鐘方向)
+            // atan2: 0度在3點鐘。我們需要 0度在6點鐘。
+            // 旋轉座標：deg - 90
+            let cssDeg = deg - 90;
+            
+            updateTimeFromAngle(cssDeg);
+        }
+
+        // 滑鼠/觸控事件監聽
+        timerArea.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            handleDrag(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            handleDrag(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // 手機觸控支援
+        timerArea.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            handleDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }, {passive: false});
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault(); // 防止滾動
+            handleDrag(e.touches[0].clientX, e.touches[0].clientY);
+        }, {passive: false});
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // 3. 返回按鈕
+        document.getElementById('mapBackBtn').addEventListener('click', () => {
+            console.log("返回首頁");
+        });
+
+    </script>
+</body>
+</html>

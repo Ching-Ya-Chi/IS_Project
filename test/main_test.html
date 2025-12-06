@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>主畫面預覽</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS 部分 --- */
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+             width: 100%;
+            height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+    
+        /* 新增：Flexbox 置中設定，模擬手機展示台 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2c2c2c; /* 深色背景，讓手機畫面更明顯 */
+        }
+
+        .main-screen {
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(221, 215, 182, 1) 100%
+            );
+            width: 393px;  
+            height: 851px;
+            padding: 60px 25px 40px 25px;
+
+            align-items: center;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden; /* 隱藏超出範圍的內容 */
+            border-radius: 40px; /* 模擬手機圓角 */
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); /* 增加陰影立體感 */
+    
+            /* 確保內部排版 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 1. 頂部導航列 (Header) --- */
+        .top-bar {
+            width: 100%;
+            height: 50px; /* 固定高度 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px; /* 移除額外 padding，使用父容器的 padding */
+            margin-bottom: 10px;
+            z-index: 20;
+        }
+
+        /* 選單觸發區域 (包覆 Icon) */
+        .menu-trigger {
+            font-size: 28px;
+            color: #BEA587; /* 配合整體色系的咖啡色，也可改 #000 */
+            cursor: pointer;
+            width: 40px; /* 加大觸控範圍 */
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 使用者頭像 (右上角) */
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #8BC34A; /* 預設綠色背景，有圖片會覆蓋 */
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- 2. 側邊選單 (Sidebar Menu) --- */
+        /* 預設隱藏在左側螢幕外 */
+        .side-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 220px; /* 寬度維持百分比 */
+            height: 100%;
+            background-color: rgba(242, 243, 245, 0.65); /* #F2F3F5 65% 透明度 */
+            backdrop-filter: blur(5px);
+            padding-top: 120px; /* 加大頂部間距，避開 Header */
+            padding-left: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 10;
+
+            white-space: nowrap; 
+            overflow: hidden; 
+            box-sizing: border-box;
+}
+
+        /* 
+           Hover 機制：
+           當滑鼠移到 .menu-wrapper (包含 icon 和 menu) 時，顯示 menu 
+           注意：手機上通常是點擊觸發 hover 狀態
+        */
+        .menu-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 50px;
+            z-index: 30;
+        }
+
+        /* 當 hover 到 wrapper 時，展開 menu 並加大 wrapper 寬度以維持 hover 狀態 */
+        .menu-wrapper:hover {
+            width: 200px;
+        }
+        
+        .menu-wrapper:hover .side-menu {
+            transform: translateX(0);
+        }
+
+        .menu-item {
+            font-size: 20px;
+            font-weight: bold;
+            color: #8B5E3C; /* 深褐色字體，對比淺色背景 */
+            text-decoration: none;
+            cursor: pointer;
+            letter-spacing: 2px;
+        }
+
+        .menu-item:hover {
+            color: #F4B04B;
+        }
+
+        /* --- 3. 中間資訊區 (Stats) --- */
+        .info-section {
+        margin-top: 10px; 
+        margin-bottom: 20px;
+        }
+
+        .info-title {
+            font-size: 20px;
+            color: #F4B04B;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .info-time {
+            font-size: 32px;
+            color: #F4B04B;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* --- 4. 地圖/圖片區塊 (Map) --- */
+.map-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* 防止圖片過大撐開 */
+    margin-bottom: 20px;
+}
+
+.map-image {
+    width: 100%;
+    max-width: 320px;
+    height: 100%;
+    object-fit: contain; /* 保持比例縮放 */
+}
+
+        /* --- 5. 底部按鈕 (Bottom Button) --- */
+.bottom-area {
+     /* 父容器已有 padding-bottom */
+    width: 100%;
+    display: flex;
+    justify-content: center; /* 按鈕水平置中 */
+    padding-bottom: 80px;
+    z-index: 5;
+}
+
+        .action-btn {
+            width: 200px;
+            height: 60px;
+            background-color: #F4B04B;
+            border-radius: 30px;
+            color: #FFFFFF; /* 白色字體 */
+            font-size: 22px;
+            font-weight: bold;
+            border: none;
+            letter-spacing: 2px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-screen">
+        
+        <!-- 
+            選單結構：
+            使用 menu-wrapper 包覆 Icon 與 Menu。
+            這樣當滑鼠從 Icon 移到 Menu 上時，Hover 狀態不會中斷。
+        -->
+        <div class="menu-wrapper">
+            <!-- 漢堡選單 Icon (絕對定位在左上) -->
+            <div class="top-bar" style="pointer-events: none;"> <!-- pointer-events: none 讓點擊穿透到 wrapper -->
+                <div class="menu-trigger" style="pointer-events: auto;">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+
+            <!-- 滑出的選單內容 -->
+            <div class="side-menu">
+                <!-- 預留連結，暫不做邏輯 -->
+                <div class="menu-item" data-target="tea-cabinet">茶 櫃</div>
+                <div class="menu-item" data-target="decoration">裝扮與成就</div>
+                <div class="menu-item" data-target="settings">設 定</div>
+            </div>
+        </div>
+
+        <!-- 真實的 Header (為了放置右邊的 Avatar) -->
+        <div class="top-bar" style="position: absolute; top: 0; width: 100%; pointer-events: none;">
+            <div></div> <!-- 左邊佔位 -->
+            <div class="user-avatar" style="pointer-events: auto;">
+                <!-- 請在此放入使用者頭像圖片路徑 -->
+                <img src="https://placehold.co/100x100/4CAF50/white?text=User" alt="User">
+            </div>
+        </div>
+
+        <!-- 中間文字資訊 -->
+        <div class="info-section">
+            <div class="info-title">今日專注時間</div>
+            <div class="info-time">3 : 00 : 00</div>
+        </div>
+
+        <!-- 中間地圖/圖片 -->
+        <div class="map-container">
+            <!-- 請在此更換您的茶園圖片路徑 -->
+            <!-- 這裡先用一個綠色色塊圖片作為示意 -->
+            <img src="https://placehold.co/300x300/81C784/ffffff?text=Map+Image" alt="茶園地圖" class="map-image">
+        </div>
+
+        <!-- 底部按鈕 -->
+        <div class="bottom-area">
+            <button id="goTeaGardenBtn" class="action-btn">
+                前往深坑茶園
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // JS 僅用於測試按鈕點擊，實際邏輯待後續整合
+        document.getElementById('goTeaGardenBtn').addEventListener('click', () => {
+            console.log("進入茶園功能...");
+        });
+
+        // 側邊選單點擊測試
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                console.log(`跳轉至: ${e.target.dataset.target}`);
+            });
+        });
+    </script>
+
+</body>
+</html>

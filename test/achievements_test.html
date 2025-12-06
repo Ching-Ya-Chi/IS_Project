@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>成就列表</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- 基礎設定 --- */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #333;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .screen {
+            width: 393px; height: 852px;
+            /* 背景漸層 */
+            background: linear-gradient(180deg, #FFFFFF 0%, #EAE5CE 100%);
+            position: relative;
+            box-sizing: border-box; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        .header {
+            width: 100%; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-top: 20px; flex-shrink: 0;
+            margin-bottom: 10px;
+        }
+
+        .back-btn {
+            position: absolute; left: 0;
+            background: none; border: none; font-size: 28px; color: #000;
+            cursor: pointer; padding: 10px 0;
+        }
+
+        .header-title-container {
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .page-title {
+            font-size: 24px; font-weight: bold; color: #000; letter-spacing: 2px;
+        }
+
+        .header-icon { font-size: 24px; color: #000; }
+
+        /* --- 大展示區塊 (Orange Box) --- */
+        .main-display-card {
+            width: 100%; height: 280px;
+            background-color: #F4B04B;
+            border-radius: 30px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: #000;
+            text-align: center;
+            padding: 20px; box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .main-avatar-circle {
+            width: 100px; height: 100px;
+            border-radius: 50%; background-color: #fff;
+            overflow: hidden; margin-bottom: 10px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .main-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* 問號樣式 */
+        .question-mark { font-size: 50px; font-weight: bold; color: #000; }
+
+        .main-title { font-size: 22px; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px; }
+        .main-level { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .main-desc { font-size: 14px; font-weight: bold; margin-bottom: auto; }
+        .main-footer { font-size: 12px; font-weight: bold; color: #fff; opacity: 0.9; margin-top: 10px; }
+
+        /* --- 列表網格區 (Grid) --- */
+        .grid-container {
+            width: 100%; flex: 1;
+            overflow-y: auto;
+            padding-bottom: 40px;
+            /* 隱藏捲軸 */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        .grid-container::-webkit-scrollbar { display: none; }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3欄 */
+            gap: 15px;
+        }
+
+        /* 小卡片樣式 */
+        .grid-item {
+            background-color: #C5A582; /* 截圖中的米褐色 */
+            border-radius: 20px;
+            height: 140px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        .grid-item:active { transform: scale(0.95); }
+
+        .grid-avatar-circle {
+            width: 60px; height: 60px;
+            border-radius: 50%; background-color: #fff;
+            overflow: hidden; margin-bottom: 10px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        .grid-title { font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 2px; }
+        .grid-level { font-size: 12px; font-weight: bold; }
+
+        /* --- 彈出視窗 (Modal) --- */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* 半透明遮罩 */
+            backdrop-filter: blur(2px);
+            z-index: 50;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* Modal 卡片背景 (灰色漸層) */
+        .modal-card {
+            width: 320px; height: 500px; /* 長方形 */
+            background: linear-gradient(180deg, #E0E0E0 0%, #BDBDBD 100%);
+            border-radius: 30px;
+            position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 40px 20px; box-sizing: border-box;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .modal-back-btn {
+            position: absolute; top: 20px; left: 20px;
+            font-size: 24px; color: #000; cursor: pointer; background: none; border: none;
+        }
+
+        /* Modal 內容樣式 */
+        .modal-avatar-circle {
+            width: 140px; height: 140px;
+            border-radius: 50%; background-color: #8BC34A; /* 預設綠底，有圖片會蓋過 */
+            overflow: hidden; margin-bottom: 20px;
+            display: flex; justify-content: center; align-items: center;
+            border: 4px solid rgba(255,255,255,0.3);
+        }
+        
+        .modal-title { font-size: 28px; font-weight: bold; letter-spacing: 3px; margin-bottom: 10px; color: #000; }
+        .modal-desc { font-size: 18px; font-weight: bold; margin-bottom: auto; color: #333; margin-top: 20px;}
+        .modal-rate { font-size: 16px; font-weight: bold; color: #000; margin-top: 30px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="screen">
+        
+        <!-- Header (動態更換) -->
+        <div class="header">
+            <button class="back-btn" id="achieveBackBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="header-title-container" id="headerContent">
+                <!-- Javascript 會填入內容 -->
+            </div>
+        </div>
+
+        <!-- 大展示區塊 (Hover 顯示詳情) -->
+        <div class="main-display-card" id="mainDisplay">
+            <!-- Javascript 會填入內容 -->
+        </div>
+
+        <!-- 列表網格 -->
+        <div class="grid-container">
+            <div class="achievements-grid" id="gridContent">
+                <!-- Javascript 會填入內容 -->
+            </div>
+        </div>
+
+        <!-- === 彈出視窗 (Modal) === -->
+        <div class="modal-overlay" id="detailModal">
+            <div class="modal-card">
+                <button class="modal-back-btn" id="modalCloseBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <!-- Modal 內容 -->
+                <div class="modal-avatar-circle">
+                    <img src="" id="modalImg" class="main-avatar-img">
+                </div>
+                <div class="modal-title" id="modalTitle">標題</div>
+                <div class="modal-desc" id="modalDesc">描述內容</div>
+                <div class="modal-rate" id="modalRate">已有 X% 的人擁有</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 設定測試模式 ---
+        // 'unlocked' = 顯示已解鎖介面
+        // 'locked'   = 顯示未解鎖介面
+        // 請修改此變數來測試不同狀態
+        const VIEW_MODE = 'unlocked'; 
+        // const VIEW_MODE = 'locked';
+
+        // --- 1. 假資料庫 (Mock Data) ---
+        const achievementsData = [
+            // 已解鎖範例
+            { 
+                id: 1, 
+                name: 'OO專家', 
+                level: 9, 
+                desc: '連續專注 X 小時', 
+                rate: '1%', 
+                img: 'https://placehold.co/150x150/4CAF50/FFFFFF?text=Avatar', // 預留圖片
+                unlocked: true 
+            },
+            // 未解鎖範例
+            { 
+                id: 2, 
+                name: 'OO高手', 
+                level: 5, 
+                desc: '連續專注 Y 小時', 
+                rate: '5%', 
+                img: '', 
+                unlocked: false 
+            },
+            // 生成填充資料 (空值)
+            ...Array.from({ length: 8 }, (_, i) => ({
+                id: i + 3,
+                name: `OO達人`,
+                level: 7,
+                desc: '達成某項神秘條件',
+                rate: '0.1%',
+                img: '',
+                unlocked: (i % 3 === 0) // 隨機讓一些是解鎖的
+            }))
+        ];
+
+        // --- DOM 元素 ---
+        const headerContent = document.getElementById('headerContent');
+        const mainDisplay = document.getElementById('mainDisplay');
+        const gridContent = document.getElementById('gridContent');
+        const detailModal = document.getElementById('detailModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalRate = document.getElementById('modalRate');
+
+        // --- 2. 初始化頁面 ---
+        function initPage() {
+            renderHeader();
+            // 預設顯示第一個資料在展示區
+            const defaultItem = achievementsData[0];
+            updateMainDisplay(defaultItem); 
+            renderGrid();
+        }
+
+        // --- Header 渲染 ---
+        function renderHeader() {
+            if (VIEW_MODE === 'unlocked') {
+                headerContent.innerHTML = `
+                    <div class="page-title">已 解 鎖</div>
+                    <i class="far fa-eye header-icon"></i>
+                `;
+            } else {
+                headerContent.innerHTML = `
+                    <div class="page-title">未 解 鎖</div>
+                    <i class="far fa-eye-slash header-icon"></i>
+                `;
+            }
+        }
+
+        // --- 渲染主要展示區 (Orange Box) ---
+        function updateMainDisplay(item) {
+            // 判斷是否依照 VIEW_MODE 顯示 (或直接依照 item 屬性)
+            // 這裡為了模擬截圖效果，強制根據 VIEW_MODE 來決定顯示邏輯
+            
+            let isItemUnlocked = item.unlocked;
+            
+            // 如果是在「未解鎖」模式下，即使該 Item 是解鎖的，也應該顯示對應 UI 風格?
+            // 依照需求：若 VIEW_MODE 是 locked，則全部顯示問號風格
+            
+            if (VIEW_MODE === 'locked' || !isItemUnlocked) {
+                // --- 未解鎖樣式 ---
+                mainDisplay.innerHTML = `
+                    <div class="main-avatar-circle">
+                        <div class="question-mark">?</div>
+                    </div>
+                    <div class="main-title">隱 藏</div>
+                    <div class="main-level" style="visibility: hidden;">Lv ?</div>
+                    <div class="main-desc" style="visibility: hidden;">條件隱藏</div>
+                    <div class="main-footer">已有 ${item.rate} 的使用著達成<br>此成就</div>
+                `;
+            } else {
+                // --- 已解鎖樣式 ---
+                mainDisplay.innerHTML = `
+                    <div class="main-avatar-circle">
+                        <img src="${item.img}" class="main-avatar-img">
+                    </div>
+                    <div class="main-title">${item.name}</div>
+                    <div class="main-level">Lv ${item.level}</div>
+                    <div class="main-desc">${item.desc}</div>
+                    <div class="main-footer">只有 ${item.rate} 的使用著達成<br>此成就</div>
+                `;
+            }
+        }
+
+        // --- 渲染網格列表 ---
+        function renderGrid() {
+            gridContent.innerHTML = '';
+            
+            achievementsData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'grid-item';
+                
+                // 決定卡片內容
+                let isHidden = (VIEW_MODE === 'locked' || !item.unlocked);
+                
+                if (isHidden) {
+                    // 未解鎖小卡
+                    card.innerHTML = `
+                        <div class="grid-avatar-circle">
+                            <div class="question-mark" style="font-size:30px">?</div>
+                        </div>
+                        <div class="grid-title">${item.name}</div>
+                        <div class="grid-level" style="visibility:hidden">Lv ${item.level}</div>
+                    `;
+                } else {
+                    // 已解鎖小卡
+                    card.innerHTML = `
+                        <div class="grid-avatar-circle">
+                            <!-- 這裡先用白色空圈代表沒圖片，有圖片則放 img -->
+                            ${item.img ? `<img src="${item.img}" class="main-avatar-img">` : ''}
+                        </div>
+                        <div class="grid-title">${item.name}</div>
+                        <div class="grid-level">Lv ${item.level}</div>
+                    `;
+                }
+
+                // 綁定事件：Hover 更新上方
+                card.addEventListener('mouseenter', () => {
+                    updateMainDisplay(item);
+                });
+
+                // 綁定事件：Click 開啟 Modal
+                card.addEventListener('click', () => {
+                    openModal(item);
+                });
+
+                gridContent.appendChild(card);
+            });
+        }
+
+        // --- 彈出視窗邏輯 ---
+        function openModal(item) {
+            let isHidden = (VIEW_MODE === 'locked' || !item.unlocked);
+
+            if (isHidden) {
+                // 未解鎖 Modal
+                modalImg.style.display = 'none'; // 隱藏圖片
+                modalImg.parentElement.innerHTML = '<div class="question-mark" style="font-size: 60px;">?</div>';
+                modalTitle.innerText = "隱 藏"; // 或 item.name
+                modalDesc.innerText = "條件尚未達成";
+                modalRate.innerText = `已有 ${item.rate} 的人擁有`;
+            } else {
+                // 已解鎖 Modal
+                // 恢復圖片容器
+                const avatarContainer = document.querySelector('.modal-avatar-circle');
+                avatarContainer.innerHTML = '';
+                const img = document.createElement('img');
+                img.className = 'main-avatar-img';
+                img.src = item.img;
+                avatarContainer.appendChild(img);
+
+                modalTitle.innerText = item.name;
+                modalDesc.innerText = item.desc;
+                modalRate.innerText = `已有 ${item.rate} 的人擁有`;
+            }
+
+            detailModal.classList.add('active');
+        }
+
+        // 關閉 Modal
+        document.getElementById('modalCloseBtn').addEventListener('click', () => {
+            detailModal.classList.remove('active');
+        });
+
+        // 點擊遮罩關閉
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) detailModal.classList.remove('active');
+        });
+
+        // 返回按鈕
+        document.getElementById('achieveBackBtn').addEventListener('click', () => {
+            console.log("返回上一頁");
+        });
+
+        // --- 啟動 ---
+        initPage();
+
+    </script>
+</body>
+</html>

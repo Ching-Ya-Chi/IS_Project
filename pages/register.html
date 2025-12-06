@@ -1,0 +1,61 @@
+
+
+    <!-- HTML 結構 (請將此部分整合至您的 JS 動態載入變數中) -->
+    <div class="register-screen">
+        
+        <!-- 頂部返回按鈕 -->
+        <div class="register-header">
+            <!-- ID: registerBackBtn，用於 JS 綁定返回事件 -->
+            <button id="registerBackBtn" class="back-button-black">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <!-- 標題 -->
+        <div class="register-title">註 冊</div>
+
+        <!-- 註冊表單 -->
+        <div class="register-form">
+            
+            <!-- 1. 帳號 -->
+            <div class="input-group">
+                <label for="reg-username">
+                    <i class="far fa-envelope"></i> 帳 號
+                </label>
+                <input type="text" id="reg-username" class="styled-input">
+            </div>
+
+            <!-- 2. 密碼 -->
+            <div class="input-group">
+                <label for="reg-password">
+                    <i class="fas fa-lock"></i> 密 碼
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="reg-password" class="styled-input">
+                    <!-- ID: toggleRegPwd -->
+                    <i class="far fa-eye toggle-password-icon" id="toggleRegPwd"></i>
+                </div>
+            </div>
+
+            <!-- 3. 確認密碼 -->
+            <div class="input-group">
+                <label for="reg-confirm-password">
+                    <i class="fas fa-lock"></i> 確認密碼
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="reg-confirm-password" class="styled-input">
+                    <!-- ID: toggleConfirmPwd -->
+                    <i class="far fa-eye toggle-password-icon" id="toggleConfirmPwd"></i>
+                </div>
+            </div>
+
+            <!-- 註冊按鈕 -->
+            <!-- ID: performRegisterBtn，用於 JS 綁定送出事件 -->
+            <button id="performRegisterBtn" class="main-register-btn">
+                註 冊
+            </button>
+
+        </div>
+    </div>
+
+   

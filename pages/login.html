@@ -1,0 +1,49 @@
+<div class="login-screen">
+    <!-- 頂部返回按鈕 -->
+    <div class="login-header">
+        <button class="back-button-black">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+
+    <!-- 標題 -->
+    <div class="login-title">登 入</div>
+
+    <!-- 表單區域 -->
+    <div class="login-form">
+        <!-- 帳號欄位 -->
+        <div class="input-group">
+            <label for="login-username">
+                <i class="far fa-envelope"></i> 帳 號
+            </label>
+            <input type="text" id="login-username" class="styled-input">
+        </div>
+
+        <!-- 密碼欄位 (★這裡修正了結構★) -->
+        <div class="input-group">
+            <label for="login-password">
+                <i class="fas fa-lock"></i> 密 碼
+            </label>
+            <!-- 關鍵：必須有 wrapper 包住 input 和 icon -->
+            <div class="password-wrapper">
+                <input type="password" id="login-password" class="styled-input">
+                <i class="far fa-eye toggle-password-icon"></i>
+            </div>
+        </div>
+
+        <!-- 忘記密碼連結 -->
+        <div class="forgot-password">
+            <a href="#">忘記密碼 ?</a>
+        </div>
+
+        <!-- 登入按鈕 -->
+        <button class="main-login-btn" id="performLoginBtn">
+            登 入
+        </button>
+
+        <!-- 註冊連結 -->
+        <div class="register-link">
+            還沒有帳號 ? <a data-page="register">註冊</a>
+        </div>
+    </div>
+</div>

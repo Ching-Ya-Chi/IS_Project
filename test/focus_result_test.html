@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>專注結果</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- 基礎設定 (與前頁一致) --- */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #333;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .screen {
+            width: 393px; height: 852px;
+            background-color: #f9f9f9; /* 淺灰白背景 */
+            position: relative;
+            box-sizing: border-box; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* --- Header --- */
+        .header {
+            width: 100%; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-top: 20px; flex-shrink: 0;
+        }
+
+        .back-btn {
+            position: absolute; left: 20px;
+            background: none; border: none; font-size: 28px; color: #000;
+            cursor: pointer; padding: 10px;
+        }
+
+        .page-title {
+            font-size: 20px; font-weight: bold; color: #F4B04B; letter-spacing: 1px;
+        }
+
+        /* --- 結果訊息區域 --- */
+        .result-message-container {
+            margin-top: 40px; margin-bottom: 30px;
+            padding: 0 30px;
+            text-align: center;
+        }
+
+        .result-text {
+            font-size: 22px; line-height: 1.5;
+            font-weight: bold; color: #F4B04B;
+        }
+
+        /* --- 專注清單 (米色方框) --- */
+        .checklist-card {
+            width: 80%;
+            background-color: #F5F5F0; /* 極淺米灰 */
+            border: 2px solid #E0D5B0; /* 米色邊框 */
+            border-radius: 15px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center;
+            margin-bottom: 20px;
+            z-index: 10; /* 確保在圖片上方 */
+        }
+
+        .checklist-title {
+            font-size: 16px; color: #F4B04B; font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .checklist-items {
+            width: 100%; display: flex; flex-direction: column; gap: 8px;
+            padding-left: 20px; /* 為了 bullet point 對齊 */
+        }
+
+        .checklist-item {
+            font-size: 14px; color: #9E9E9E; font-weight: bold;
+            display: list-item; /* 顯示圓點 */
+            list-style-type: disc;
+        }
+        /* 若要像截圖一樣是淺棕色圓點，可改用 ::before 實作，這裡先用原生樣式保持簡潔 */
+
+        /* --- 底部圖片 --- */
+        .bottom-visual {
+            flex: 1; width: 100%;
+            position: relative;
+            display: flex; align-items: flex-end;
+            margin-top: auto; /* 推到底部 */
+        }
+
+        .result-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: center bottom;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="screen">
+        
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" id="resultBackBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="page-title">1792 茶園</div>
+        </div>
+
+        <!-- 結果文字 (由 JS 動態填入) -->
+        <div class="result-message-container">
+            <div class="result-text" id="resultMessage">
+                <!-- 範例：你已成功專注 1 hrs 20 mins !<br>恭喜獲得「紅茶」 -->
+            </div>
+        </div>
+
+        <!-- 專注清單 -->
+        <div class="checklist-card">
+            <div class="checklist-title">專注清單</div>
+            <div class="checklist-items">
+                <div class="checklist-item">閱讀書籍</div>
+                <div class="checklist-item">整理筆記</div>
+                <div class="checklist-item">不滑手機</div>
+            </div>
+        </div>
+
+        <!-- 底部圖片 (由 JS 動態更換) -->
+        <div class="bottom-visual">
+            <img src="" class="result-img" id="resultImage" alt="Result Visual">
+        </div>
+
+    </div>
+
+    <script>
+        // --- 模擬參數設定 (請修改此處來測試不同狀態) ---
+        
+        // 1. 設定狀態： true = 成功, false = 失敗/中斷
+        const isSuccess = true; 
+
+        // 2. 設定時間 (單位：秒)
+        const plannedTimeSeconds = 4800; // 原定計畫: 1小時20分 (80分)
+        const remainingTimeSeconds = 0;  // 剩餘時間: 0 (代表做完了)
+        // 若是失敗測試，可改為 remainingTimeSeconds = 2400 (剩40分，代表只做了40分)
+
+        // --- 邏輯處理 ---
+
+        const resultMessageEl = document.getElementById('resultMessage');
+        const resultImageEl = document.getElementById('resultImage');
+        const backBtn = document.getElementById('resultBackBtn');
+
+        // 計算實際專注時間 (原定 - 剩餘)
+        const actualSeconds = plannedTimeSeconds - remainingTimeSeconds;
+        const hrs = Math.floor(actualSeconds / 3600);
+        const mins = Math.floor((actualSeconds % 3600) / 60);
+
+        // 建構時間字串 (如: 1 hrs 20 mins)
+        // 如果 hrs 為 0，是否顯示可自行決定，這裡依照附圖格式顯示
+        const timeString = `${hrs} hrs ${mins} mins`;
+
+        // 根據狀態渲染頁面
+        if (isSuccess) {
+            // --- 成功狀態 ---
+            resultMessageEl.innerHTML = `
+                你已成功專注 ${timeString} ！<br>
+                恭喜獲得「紅茶」
+            `;
+            
+            // 設定成功圖片 (請替換為您的路徑)
+            resultImageEl.src = "https://placehold.co/393x450/e8f5e9/558b2f?text=Success+Plant";
+            
+        } else {
+            // --- 失敗/中斷狀態 ---
+            resultMessageEl.innerHTML = `
+                你專注了 ${timeString}<br>
+                但失去「紅茶」，再接再厲！
+            `;
+            
+            // 設定失敗圖片 (請替換為您的路徑)
+            resultImageEl.src = "https://placehold.co/393x450/fff3e0/e65100?text=Failure+Plant";
+        }
+
+        // 返回按鈕事件
+        backBtn.addEventListener('click', () => {
+            console.log("返回首頁");
+            // window.location.href = 'main_test.html';
+        });
+
+    </script>
+</body>
+</html>

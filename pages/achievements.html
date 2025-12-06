@@ -1,25 +1,41 @@
-<div class="achievement-decoration-page-container">
-    <header class="achievement-decoration-header">
-        <button class="back-button">
+<!-- pages/achievements.html -->
+<div class="screen">
+    
+    <!-- Header -->
+    <div class="header">
+        <button class="back-btn">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <div class="achievement-decoration-title">成就與裝扮</div>
-    </header>
-    <div class="achievement-decoration-content">
-        <div class="top-blocks">
-            <div class="decoration-block">
-                <img id="currentAccessoryImage" src="./img/成就1_服飾.jpg" alt="裝飾配件"> <!-- 左邊配件圖片 -->
-            </div>
-            <div class="tea-collection-block">
-                <img id="currentCabinetImage" src="./img/red_tea.png" alt="茶櫃物品"> <!-- 右邊茶櫃物品圖片 -->
-            </div>
-        </div>
-        <button class="status-toggle-button" id="toggleAchievementStatus">狀態</button> <!-- 新增：狀態切換按鈕 -->
-        <div class="description-text">
-            <p>左邊是裝扮</p>
-            <p>右邊是要收集的茶</p>
-            <p>點擊"狀態"可切換組合</p>
-        </div>
-        <button class="apply-button" id="applyDecoration">套用</button> <!-- 點擊後套用裝扮 -->
+        <!-- 標題會由 JS 根據狀態填入 (已解鎖/未解鎖) -->
+        <div class="header-title-container" id="achieveHeaderTitle"></div>
     </div>
+
+    <!-- 1. 中間大展示區塊 (Orange Box) -->
+    <!-- Hover 下方網格時，這裡的內容會變動 -->
+    <div class="main-display-card" id="mainDisplayArea">
+        <!-- JS 會動態填入內容 -->
+    </div>
+
+    <!-- 2. 列表網格區 (Grid) -->
+    <div class="grid-container">
+        <div class="achievements-grid" id="achievementsGrid">
+            <!-- JS 會動態填入小卡片 -->
+        </div>
+    </div>
+
+    <!-- 3. 彈出視窗 (Grey Modal) -->
+    <div class="modal-overlay" id="achieveModal">
+        <div class="modal-card achievement-modal-style">
+            <!-- 關閉按鈕 -->
+            <button class="modal-back-btn" id="modalCloseBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <!-- Modal 內容容器 -->
+            <div id="modalContent">
+                <!-- JS 動態填入 -->
+            </div>
+        </div>
+    </div>
+
 </div>

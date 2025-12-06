@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>專注計時中</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- 基礎設定 --- */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #333;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .screen {
+            width: 393px; height: 852px;
+            background-color: #f9f9f9;
+            position: relative;
+            box-sizing: border-box; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* --- Header --- */
+        .header {
+            width: 100%; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-top: 20px; flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .back-btn {
+            position: absolute; left: 20px;
+            background: none; border: none; font-size: 28px; color: #000;
+            cursor: pointer; padding: 10px;
+        }
+
+        .page-title {
+            font-size: 20px; font-weight: bold; color: #F4B04B; letter-spacing: 1px;
+        }
+
+        /* --- 計時器區域 --- */
+        .timer-section {
+            margin-top: 30px;
+            width: 260px; height: 260px;
+            background-color: rgba(220, 210, 180, 0.4);
+            border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative;
+            flex-shrink: 0;
+            z-index: 5; /* 確保在影片上方 */
+        }
+        
+        .timer-section::before {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 2px; height: 10px; background-color: #F4B04B;
+        }
+        .timer-dot {
+            position: absolute; bottom: 30px; right: 40px;
+            width: 20px; height: 20px; background-color: #F4B04B; border-radius: 50%;
+        }
+
+        .timer-text { color: #C19A6B; font-weight: bold; text-align: center; }
+        .timer-val { font-size: 56px; line-height: 1; }
+        .timer-unit { font-size: 24px; color: #a89070; margin-left: 5px;}
+
+        /* --- 主視覺區域 (改為影片) --- */
+        .main-visual {
+            flex: 1; width: 100%;
+            position: relative;
+            display: flex; justify-content: center; align-items: flex-end;
+            margin-top: 20px;
+            overflow: hidden; /* 防止影片溢出 */
+        }
+
+        /* 影片樣式 (沿用原本 img 的樣式) */
+        .main-img {
+            width: 100%; height: 100%; 
+            object-fit: cover; /* 保持比例填滿 */
+            /* 讓影片頂部有漸層淡出效果，銜接計時器 */
+            mask-image: linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+        }
+
+        /* 米色方格 (專注清單) */
+        .checklist-box {
+            position: absolute;
+            top: 20px; right: 20px;
+            width: 140px;
+            background-color: rgba(220, 215, 182, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .checklist-title {
+            font-size: 14px; color: #F4B04B; font-weight: bold; margin-bottom: 8px; text-align: center;
+        }
+        .checklist-item {
+            font-size: 12px; color: #8a7c68; margin-bottom: 5px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .checklist-item::before { content: '•'; font-weight: bold; }
+
+        /* --- 浮動視窗 (Modal) --- */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: 50;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            width: 320px; background-color: #F2F3F5; border-radius: 20px;
+            padding: 30px 20px; box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+
+        .warn-title { font-size: 20px; color: #F4B04B; font-weight: bold; margin-bottom: 10px; }
+        .warn-desc { font-size: 13px; color: #999; margin-bottom: 20px; line-height: 1.5; }
+        
+        .warn-img {
+            width: 180px; height: 180px; object-fit: contain; margin-bottom: 25px;
+            border-radius: 10px;
+        }
+
+        .btn-group { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+        
+        .btn-base {
+            width: 100%; height: 50px; border-radius: 25px;
+            font-size: 18px; font-weight: bold; letter-spacing: 2px;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+        }
+        .btn-abort { background-color: transparent; border: 2px solid #F4B04B; color: #bea587; }
+        .btn-return { background-color: #F4B04B; border: none; color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+    </style>
+</head>
+<body>
+
+    <div class="screen">
+        
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" id="focusBackBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="page-title">1792 茶園</div>
+        </div>
+
+        <!-- 計時器顯示 -->
+        <div class="timer-section">
+            <div class="timer-text">
+                <span class="timer-val" id="timerHr">1</span> <span class="timer-unit">hr</span><br>
+                <span class="timer-val" id="timerMin">20</span> <span class="timer-unit">mins</span>
+            </div>
+            <div class="timer-dot"></div>
+        </div>
+
+        <!-- 主視覺區域 (影片) -->
+        <div class="main-visual">
+            <!-- 
+                這裡替換成了 <video> 標籤
+                請在 src="" 填入您的 MP4 檔案路徑 
+                例如: src="videos/tea_garden_loop.mp4"
+            -->
+            <video class="main-img" autoplay loop muted playsinline>
+                <source src="../img/newImage/roasting.mp4" type="video/mp4">
+                您的瀏覽器不支援影片播放。
+            </video>
+
+            <!-- 浮動米色方格 (專注清單) -->
+            <div class="checklist-box">
+                <div class="checklist-title">專注清單</div>
+                <div class="checklist-item">閱讀書籍</div>
+                <div class="checklist-item">整理筆記</div>
+                <div class="checklist-item">不滑手機</div>
+            </div>
+        </div>
+
+        <!-- === 確定中斷 浮動視窗 (Modal) === -->
+        <div class="modal-overlay" id="abortModal">
+            <div class="modal-card">
+                <div class="warn-title">確定要返回主畫面嗎？</div>
+                <div class="warn-desc">將失去茶櫃中隨機一個以收集的茶種</div>
+                
+                <!-- 預留 Modal 圖片 -->
+                <img src="../img/newImage/托盤茶米.png" class="warn-img" alt="Warning">
+
+                <div class="btn-group">
+                    <button class="btn-base btn-abort" id="confirmAbortBtn">確認中斷</button>
+                    <button class="btn-base btn-return" id="returnFocusBtn">取消，返回專注</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DOM 元素 ---
+        const focusBackBtn = document.getElementById('focusBackBtn');
+        const abortModal = document.getElementById('abortModal');
+        const returnFocusBtn = document.getElementById('returnFocusBtn');
+        const confirmAbortBtn = document.getElementById('confirmAbortBtn');
+        const timerHrEl = document.getElementById('timerHr');
+        const timerMinEl = document.getElementById('timerMin');
+
+        // --- 1. 計時器邏輯 ---
+        let totalSeconds = 4800; // Default: 1hr 20min
+        let timerInterval = null;
+
+        function startTimer(initialSeconds) {
+            totalSeconds = initialSeconds;
+            updateDisplay();
+            
+            timerInterval = setInterval(() => {
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    updateDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    console.log("計時結束");
+                }
+            }, 1000);
+        }
+
+        function updateDisplay() {
+            const hr = Math.floor(totalSeconds / 3600);
+            const min = Math.floor((totalSeconds % 3600) / 60);
+            timerHrEl.innerText = hr;
+            timerMinEl.innerText = min;
+        }
+
+        startTimer(4800);
+
+        // --- 2. Modal 開關邏輯 ---
+        focusBackBtn.addEventListener('click', () => {
+            abortModal.classList.add('active');
+        });
+
+        returnFocusBtn.addEventListener('click', () => {
+            abortModal.classList.remove('active');
+        });
+
+        abortModal.addEventListener('click', (e) => {
+            if (e.target === abortModal) {
+                abortModal.classList.remove('active');
+            }
+        });
+
+        confirmAbortBtn.addEventListener('click', () => {
+            console.log("執行中斷邏輯");
+            // window.location.href = 'main_test.html';
+        });
+    </script>
+</body>
+</html>

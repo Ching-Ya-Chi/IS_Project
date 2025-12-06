@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>裝扮頁面</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- 基礎設定 --- */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #333;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .screen {
+            width: 393px; height: 852px;
+            /* 背景漸層 */
+            background: linear-gradient(180deg, #FFFFFF 0%, #EAE5CE 100%);
+            position: relative;
+            box-sizing: border-box; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 0 25px;
+        }
+
+        /* --- Header --- */
+        .header {
+            width: 100%; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; margin-top: 20px; flex-shrink: 0;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            position: absolute; left: 0;
+            background: none; border: none; font-size: 28px; color: #000;
+            cursor: pointer; padding: 10px 0;
+        }
+
+        .page-title {
+            font-size: 24px; font-weight: bold; color: #000; letter-spacing: 2px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .header-icon { font-size: 24px; color: #000; }
+
+        /* --- 中間大展示區 (Preview Box) --- */
+        .preview-card {
+            width: 100%; height: 320px;
+            background-color: #F4B04B; /* 橘色背景 */
+            border-radius: 30px;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            overflow: hidden; /* 確保圖片不溢出圓角 */
+        }
+
+        .preview-img {
+            width: 100%; height: 100%;
+            object-fit: cover; /* 或 contain，視您的圖片而定 */
+        }
+
+        /* --- 裝飾物選單區 (Items Container) --- */
+        .items-container {
+            width: 100%;
+            display: flex; flex-direction: column; gap: 15px;
+            margin-bottom: auto; /* 推開底部按鈕 */
+        }
+
+        .items-row {
+            width: 100%; height: 100px;
+            background-color: #F4B04B; /* 橘色背景 */
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: space-around;
+            padding: 0 10px; box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* 單個物品格子 */
+        .item-box {
+            width: 60px; height: 60px;
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent; /* 預留邊框空間 */
+        }
+
+        /* 物品圖片 */
+        .item-img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            /* 防止點擊圖片時觸發拖曳 */
+            pointer-events: none; 
+        }
+
+        /* --- 被選取狀態 (Selected State) --- */
+        .item-box.selected {
+            background-color: rgba(255, 255, 255, 0.4); /* 半透明白底 */
+            border-color: #FFF; /* 白色邊框 */
+            transform: scale(1.05); /* 稍微放大 */
+        }
+
+        /* --- 底部按鈕區 --- */
+        .footer-btns {
+            width: 100%;
+            display: flex; justify-content: space-between;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+
+        .action-btn {
+            flex: 1; /* 平均分配寬度 */
+            height: 65px;
+            background-color: #F4B04B;
+            border-radius: 32.5px;
+            border: none;
+            color: #FFF; font-size: 24px; font-weight: bold; letter-spacing: 4px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: transform 0.1s;
+        }
+
+        .action-btn:active { transform: scale(0.98); }
+
+    </style>
+</head>
+<body>
+
+    <div class="screen">
+        
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" id="costumeBackBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="page-title">
+                裝 扮 <i class="fas fa-tshirt header-icon"></i>
+            </div>
+        </div>
+
+        <!-- 1. 中間大展示區 (預留圖片) -->
+        <div class="preview-card">
+            <!-- 請在此輸入角色預覽圖片路徑 -->
+            <!-- 這裡先放一張透明圖或底圖 -->
+            <img src="https://placehold.co/300x320/F4B04B/FFFFFF?text=Character+Preview" class="preview-img" alt="Character Preview">
+        </div>
+
+        <!-- 2. 下方裝飾物元素 (預留圖片) -->
+        <div class="items-container">
+            
+            <!-- 第一排：衣服類 -->
+            <div class="items-row">
+                <!-- Item 1 -->
+                <div class="item-box" data-id="c1">
+                    <img src="https://placehold.co/60x60/transparent/FFF?text=Shirt" class="item-img">
+                </div>
+                <!-- Item 2 -->
+                <div class="item-box" data-id="c2">
+                    <img src="https://placehold.co/60x60/transparent/FFF?text=Dress" class="item-img">
+                </div>
+                <!-- Item 3 -->
+                <div class="item-box" data-id="c3">
+                    <img src="https://placehold.co/60x60/transparent/FFF?text=Pants" class="item-img">
+                </div>
+                <!-- Item 4 -->
+                <div class="item-box" data-id="c4">
+                    <img src="https://placehold.co/60x60/transparent/FFF?text=Bow" class="item-img">
+                </div>
+            </div>
+
+            <!-- 第二排：配件類 -->
+            <div class="items-row">
+                <!-- Item 5 -->
+                <div class="item-box" data-id="a1">
+                    <img src="https://placehold.co/60x60/transparent/FFF?text=Hat" class="item-img">
+                </div>
+                <!-- Item 6 -->
+                <div class="item-box" data-id="a2">
+                    <img src="https://placehold.co/60x60/transparent/FFF?text=Tie" class="item-img">
+                </div>
+                <!-- Item 7 -->
+                <div class="item-box" data-id="a3">
+                    <img src="https://placehold.co/60x60/transparent/FFF?text=Bag" class="item-img">
+                </div>
+                <!-- Item 8 -->
+                <div class="item-box" data-id="a4">
+                    <img src="https://placehold.co/60x60/transparent/FFF?text=Sock" class="item-img">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 3. 底部按鈕 (功能保留) -->
+        <div class="footer-btns">
+            <button class="action-btn" id="btnWear">穿 戴</button>
+            <button class="action-btn" id="btnUnwear">卸 下</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 變數 ---
+        const itemBoxes = document.querySelectorAll('.item-box');
+        const btnWear = document.getElementById('btnWear');
+        const btnUnwear = document.getElementById('btnUnwear');
+        const backBtn = document.getElementById('costumeBackBtn');
+        let selectedItemId = null;
+
+        // --- 4. 點擊裝飾物效果 ---
+        itemBoxes.forEach(box => {
+            box.addEventListener('click', () => {
+                // A. 移除所有項目的選取狀態 (互斥選擇)
+                itemBoxes.forEach(b => b.classList.remove('selected'));
+                
+                // B. 為當前點擊的項目加上選取狀態
+                box.classList.add('selected');
+                
+                // C. 紀錄被選取的 ID
+                selectedItemId = box.getAttribute('data-id');
+                console.log(`已選擇物品 ID: ${selectedItemId}`);
+            });
+        });
+
+        // --- 按鈕功能保留 ---
+        btnWear.addEventListener('click', () => {
+            if (selectedItemId) {
+                console.log(`執行穿戴邏輯，物品: ${selectedItemId}`);
+                alert(`已穿戴物品 (ID: ${selectedItemId})`);
+            } else {
+                console.log("請先選擇一個物品");
+            }
+        });
+
+        btnUnwear.addEventListener('click', () => {
+            console.log("執行卸下邏輯");
+            // 清除選取狀態
+            itemBoxes.forEach(b => b.classList.remove('selected'));
+            selectedItemId = null;
+        });
+
+        // 返回按鈕
+        backBtn.addEventListener('click', () => {
+            console.log("返回首頁");
+        });
+
+    </script>
+</body>
+</html>

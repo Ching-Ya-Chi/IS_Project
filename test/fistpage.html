@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>入口主頁預覽</title>
+    
+    <style>
+        /* --- CSS 部分 (請複製到您的 style.css) --- */
+        
+        /* 1. 全域設定 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+        }
+
+        /* 2. 主畫面容器 */
+        .first-page-screen {
+            /* Linear 背景色: 白 -> 米黃 (rgba(221, 215, 182, 1)) */
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(221, 215, 182, 1) 100%
+            );
+            width: 100%;
+            height: 100vh; /* 佔滿螢幕 */
+            display: flex;
+            flex-direction: column;
+            /* 讓內容靠下對齊，模擬附圖按鈕在下方的排版 */
+            justify-content: flex-end; 
+            align-items: center;
+            padding-bottom: 150px; /* 距離底部的留白，可依需求調整 */
+            box-sizing: border-box;
+        }
+
+        /* 3. 按鈕容器 */
+        .menu-button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* 按鈕之間的間距 */
+        }
+
+        /* 4. 入口按鈕樣式 (共用) */
+        .menu-btn {
+            width: 180px; /* 寬度 */
+            height: 60px; /* 高度 */
+            background-color: #F4B04B; /* 需求顏色: 按鈕底色 */
+            border-radius: 30px; /* 圓角 (高度的一半，形成橢圓) */
+            color: #F2F3F5; /* 需求顏色: 按鈕字體 */
+            font-size: 24px;
+            font-weight: bold;
+            border: none;
+            letter-spacing: 6px; /* 字距加大，讓文字看起來更開闊 */
+            text-indent: 6px;    /* 修正 letter-spacing 造成的視覺偏移 */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* 陰影 */
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 按下時的縮放效果 */
+        .menu-btn:active {
+            transform: scale(0.95);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HTML 結構 (請將此部分整合至您的 JS 動態載入變數中) -->
+    <div class="first-page-screen">
+        
+        <div class="menu-button-container">
+            <!-- 登入按鈕 -->
+            <button id="entryLoginBtn" class="menu-btn">
+                登 入
+            </button>
+
+            <!-- 註冊按鈕 -->
+            <button id="entryRegisterBtn" class="menu-btn">
+                註 冊
+            </button>
+        </div>
+
+    </div>
+
+    <!-- 
+       JS 部分：
+       這裡模擬如何在您的 script.js 中處理跳轉。
+    -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 監聽登入按鈕 -> 跳轉到登入頁面
+            const loginBtn = document.getElementById('entryLoginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', () => {
+                    // 在您的 SPA 架構中，這裡應該呼叫 showLoginPage()
+                    console.log("跳轉至登入頁面...");
+                    alert("(測試) 準備載入登入頁面 HTML");
+                });
+            }
+
+            // 監聽註冊按鈕 -> 跳轉到註冊頁面
+            const registerBtn = document.getElementById('entryRegisterBtn');
+            if (registerBtn) {
+                registerBtn.addEventListener('click', () => {
+                    // 在您的 SPA 架構中，這裡應該呼叫 showRegisterPage()
+                    console.log("跳轉至註冊頁面...");
+                    alert("(測試) 準備載入註冊頁面 HTML");
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
