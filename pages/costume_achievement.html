@@ -1,6 +1,7 @@
 <div class="screen">
+    <!-- Header -->
     <div class="header">
-        <button class="back-btn">
+        <button class="back-btn" data-page="main">
             <i class="fas fa-chevron-left"></i>
         </button>
         <div class="page-title">裝 扮 與 成 就</div>
@@ -10,29 +11,19 @@
     <div class="summary-section">
         <i class="fas fa-clipboard-check summary-icon"></i>
         <div class="summary-text-group">
-            <div class="summary-count">11 / 68</div>
+            <!-- ★ 修改：加入 id="summaryCount" -->
+            <div class="summary-count" id="summaryCount">0 / 0</div>
             <div class="summary-label">已達成的成就總計</div>
         </div>
     </div>
 
     <!-- Top 3 成就展示 -->
-    <div class="badge-container">
-        <div class="badge-card">
-            <div class="badge-img-circle"><img src="" class="badge-img"></div>
-            <div class="badge-name">OO高手</div>
-        </div>
-        <div class="badge-card">
-            <div class="badge-img-circle"><img src="" class="badge-img"></div>
-            <div class="badge-name">OO達人</div>
-        </div>
-        <div class="badge-card">
-            <div class="badge-img-circle"><img src="" class="badge-img"></div>
-            <div class="badge-name">OO專家</div>
-        </div>
+    <!-- ★ 修改：加入 id="topBadgesContainer"，並清空內部假資料 -->
+    <div class="badge-container" id="topBadgesContainer">
+        <!-- JS 會動態填入 badge-card -->
     </div>
 
-    <!-- 功能按鈕選單 -->
-    <!-- 修正：加入 data-page 與 data-arg，並使用 menu-btn-wide 樣式 -->
+    <!-- 功能按鈕選單 (保持不變) -->
     <div class="menu-container">
         <button class="menu-btn" data-page="achievements" data-arg="unlocked">
             <i class="far fa-eye btn-icon"></i>

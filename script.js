@@ -98,6 +98,116 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    const globalAchievements=[
+                { 
+                    id: 1, 
+                    name: '紅茶專家', 
+                    level: 9, 
+                    img: '../img/newImage/clothes_hat.png',
+                    desc: '連續專注 3 hr', 
+                    rate: '1%',
+                    isUnlocked: true
+                },
+                { 
+                    id: 2, 
+                    name: '品茶高手', 
+                    level: 4, 
+                    img: '../img/newImage/clothes_sunglasses.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: true
+                },
+                { 
+                    id: 3, 
+                    name: '青茶高手', 
+                    level: 4, 
+                    img: '../img/newImage/clothes_elf.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: true
+                },
+                { 
+                    id: 4, 
+                    name: '黃茶高手', 
+                    level: 1, 
+                    img: '../img/newImage/clothes_snowmanHat.png',
+                    desc: '連續專注 0.5 hr', 
+                    rate: '0%',
+                    isUnlocked: true
+                },
+                { 
+                    id: 5, 
+                    name: '綠茶高手', 
+                    level: 1, 
+                    img: '../img/newImage/clothes_snowmanHat.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: true
+                },
+                { 
+                    id: 6, 
+                    name: '烘茶高手', 
+                    level: 1, 
+                    img: '../img/newImage/clothes_santa.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: true
+                },
+                { 
+                    id: 7, 
+                    name: '綠茶高手', 
+                    level: 10, 
+                    img: '../img/newImage/clothes_snowman.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: false
+                },
+                { 
+                    id: 8, 
+                    name: '綠茶高手', 
+                    level: 1, 
+                    img: '../img/newImage/clothes_deer.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: false
+                },
+                { 
+                    id: 9, 
+                    name: '綠茶高手', 
+                    level: 1, 
+                    img: '../img/newImage/clothes_dragon.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: false
+                },
+                { 
+                    id: 10, 
+                    name: '綠茶高手', 
+                    level: 1, 
+                    img: '../img/newImage/clothes_gold.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: false
+                },
+                { 
+                    id: 11, 
+                    name: '綠茶高手', 
+                    level: 1, 
+                    img: '../img/newImage/clothes_goldhHat.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: false
+                },
+                { 
+                    id: 12, 
+                    name: '綠茶高手', 
+                    level: 1, 
+                    img: '../img/newImage/clothes_lantern.png',
+                    desc: '連續專注 1 hr', 
+                    rate: '20%',
+                    isUnlocked: false
+                }
+            ];
     // --- 核心路由函式 (已確認包含 arg) ---
     window.loadPage = async function(pageName, addToHistory = true, arg = null) {
         if (activeInterval) {
@@ -663,83 +773,116 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 7. 成就
         achievements: (arg) => {
+            // 接收狀態：'unlocked' (已解鎖) 或 'locked' (未解鎖)
             const viewMode = arg || 'unlocked';
+            
             const headerTitle = document.getElementById('achieveHeaderTitle');
             const mainDisplay = document.getElementById('mainDisplayArea');
             const gridContainer = document.getElementById('achievementsGrid');
             const modal = document.getElementById('achieveModal');
             const modalContent = document.getElementById('modalContent');
 
+            // 設定標題
             if (headerTitle) {
-                headerTitle.innerHTML = viewMode === 'unlocked' 
-                    ? `<span class="page-title">已 解 鎖</span> <i class="far fa-eye" style="font-size:20px; margin-left:10px;"></i>`
-                    : `<span class="page-title">未 解 鎖</span> <i class="far fa-eye-slash" style="font-size:20px; margin-left:10px;"></i>`;
+                if (viewMode === 'unlocked') {
+                    headerTitle.innerHTML = `<span class="page-title">已 解 鎖</span> <i class="far fa-eye" style="font-size:20px; margin-left:10px;"></i>`;
+                } else {
+                    headerTitle.innerHTML = `<span class="page-title">未 解 鎖</span> <i class="far fa-eye-slash" style="font-size:20px; margin-left:10px;"></i>`;
+                }
             }
 
-            const achievementsData = [
-                { id: 1, name: 'OO專家', level: 9, desc: '連續專注 50 小時', rate: '1%', img: 'https://placehold.co/150x150/4CAF50/FFFFFF?text=Avatar', unlocked: (viewMode === 'unlocked') },
-                ...Array.from({ length: 8 }, (_, i) => ({ id: i + 2, name: 'OO高手', level: 5, desc: '達成條件未知', rate: '3%', img: '', unlocked: false }))
-            ];
+            // ★ 修正點：根據 viewMode 篩選要顯示的資料
+            let filteredData = [];
+            if (viewMode === 'unlocked') {
+                filteredData = globalAchievements.filter(item => item.isUnlocked === true);
+            } else {
+                filteredData = globalAchievements.filter(item => item.isUnlocked === false);
+            }
 
+            // 輔助：產生圖片 HTML (未解鎖的會變灰)
             function getAvatarHtml(item, sizeClass) {
-                return item.unlocked ? `<img src="${item.img}" class="${sizeClass}">` : `<div class="question-mark">?</div>`;
+                const lockedClass = item.isUnlocked ? '' : 'locked-visual';
+                // 即使是未解鎖，現在也顯示圖片 (但會有 locked-visual 樣式變灰)
+                return `<img src="${item.img}" class="${sizeClass} ${lockedClass}" alt="${item.name}">`;
             }
 
+            // 更新上方大展示區
             function updateMainDisplay(item) {
                 if(!mainDisplay) return;
-                const isLocked = !item.unlocked;
                 mainDisplay.innerHTML = `
-                    <div class="achieve-avatar-circle">${getAvatarHtml(item, 'achieve-avatar-img')}</div>
-                    <div class="achieve-title">${isLocked ? '???' : item.name}</div>
-                    <div class="achieve-level">${isLocked ? 'Lv ?' : 'Lv ' + item.level}</div>
-                    <div class="achieve-desc">${isLocked ? '條件尚未達成' : item.desc}</div>
+                    <div class="achieve-avatar-circle">
+                        ${getAvatarHtml(item, 'achieve-avatar-img')}
+                    </div>
+                    <div class="achieve-title">${item.name}</div>
+                    <div class="achieve-level">Lv ${item.level}</div>
+                    <div class="achieve-desc">${item.desc}</div>
                     <div class="achieve-footer">只有 ${item.rate} 的使用者達成<br>此成就</div>
                 `;
             }
 
+            // 渲染網格
             function renderGrid() {
                 if(!gridContainer) return;
-                gridContainer.innerHTML = '';
-                achievementsData.forEach(item => {
+                gridContainer.innerHTML = ''; 
+
+                if (filteredData.length === 0) {
+                    gridContainer.innerHTML = '<div style="grid-column: span 3; text-align: center; margin-top: 50px; color: #666;">此分類暫無成就</div>';
+                    return;
+                }
+
+                filteredData.forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'grid-item';
-                    const isLocked = !item.unlocked;
+                    
                     card.innerHTML = `
-                        <div class="grid-avatar-circle">${getAvatarHtml(item, 'achieve-avatar-img')}</div>
-                        <div class="grid-title">${isLocked ? '???' : item.name}</div>
-                        <div class="grid-level">${isLocked ? '' : 'Lv ' + item.level}</div>
+                        <div class="grid-avatar-circle">
+                             ${getAvatarHtml(item, 'achieve-avatar-img')}
+                        </div>
+                        <div class="grid-title">${item.name}</div>
+                        <div class="grid-level">Lv ${item.level}</div>
                     `;
+
                     card.addEventListener('mouseenter', () => updateMainDisplay(item));
                     card.addEventListener('click', () => openModal(item));
                     gridContainer.appendChild(card);
                 });
             }
 
+            // 開啟 Modal
             function openModal(item) {
                 if(!modal || !modalContent) return;
-                const isLocked = !item.unlocked;
                 modalContent.innerHTML = `
                     <div class="modal-content-wrapper">
-                        <div class="modal-avatar-large">${getAvatarHtml(item, 'achieve-avatar-img')}</div>
-                        <div class="modal-title">${isLocked ? '???' : item.name}</div>
-                        <div class="modal-level">${isLocked ? 'Lv ?' : 'Lv ' + item.level}</div>
-                        <div class="modal-desc">${isLocked ? '繼續努力種植茶葉<br>即可解鎖此成就！' : item.desc}</div>
+                        <div class="modal-avatar-large">
+                            ${getAvatarHtml(item, 'achieve-avatar-img')}
+                        </div>
+                        <div class="modal-title">${item.name}</div>
+                        <div class="modal-level">Lv ${item.level}</div>
+                        <div class="modal-desc">${item.desc}</div>
                         <div class="modal-rate">已有 ${item.rate} 的人擁有</div>
                     </div>
                 `;
                 modal.classList.add('active');
             }
 
+            // 初始化
             renderGrid();
-            if (achievementsData.length > 0) updateMainDisplay(achievementsData[0]);
+            // 預設顯示篩選後的第一筆，如果沒有資料則清空大卡片
+            if (filteredData.length > 0) {
+                updateMainDisplay(filteredData[0]);
+            } else if (mainDisplay) {
+                mainDisplay.innerHTML = ''; // 或顯示預設圖
+            }
 
+            // 綁定關閉
             if(modal) {
                 modal.addEventListener('click', (e) => {
-                    if (e.target === modal || e.target.closest('#modalCloseBtn')) modal.classList.remove('active');
+                    if (e.target === modal || e.target.closest('#modalCloseBtn')) {
+                        modal.classList.remove('active');
+                    }
                 });
             }
         },
-
         // 8. 結果頁
         focus_result: (data) => {
             const session = data || { success: false, totalTime: 4800, remainingTime: 2400, checklist: ['無待辦事項'] };
@@ -777,6 +920,61 @@ document.addEventListener('DOMContentLoaded', function() {
                     resultSuccessImage.pause();
                 }
                 if(resultFailImage) resultFailImage.style.display = 'block';
+            }
+        },
+        //costume_achievements
+        costume_achievement: () => {
+            const summaryCount = document.getElementById('summaryCount');
+            const topBadgesContainer = document.getElementById('topBadgesContainer');
+
+            // 1. 計算數量
+            const totalCount = globalAchievements.length;
+            
+            // ★ 修正點：資料庫屬性是 isUnlocked，不是 unlocked
+            const unlockedList = globalAchievements.filter(item => item.isUnlocked);
+            const unlockedCount = unlockedList.length;
+
+            if (summaryCount) {
+                summaryCount.innerText = `${unlockedCount} / ${totalCount}`;
+            }
+
+            // 2. 隨機抽出 3 個已擁有的成就
+            if (topBadgesContainer) {
+                topBadgesContainer.innerHTML = ''; // 清空
+
+                let displayList = [];
+                if (unlockedCount <= 3) {
+                    displayList = unlockedList;
+                } else {
+                    // 洗牌演算法
+                    const shuffled = [...unlockedList];
+                    for (let i = shuffled.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                    }
+                    displayList = shuffled.slice(0, 3);
+                }
+
+                // 渲染
+                displayList.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'badge-card';
+                    card.innerHTML = `
+                        <div class="badge-img-circle">
+                            <img src="${item.img}" class="badge-img" alt="${item.name}">
+                        </div>
+                        <div class="badge-name">${item.name}</div>
+                    `;
+                    topBadgesContainer.appendChild(card);
+                });
+
+                // 補空位
+                for(let i=0; i < (3 - displayList.length); i++) {
+                    const emptyCard = document.createElement('div');
+                    emptyCard.className = 'badge-card';
+                    emptyCard.style.visibility = 'hidden';
+                    topBadgesContainer.appendChild(emptyCard);
+                }
             }
         }
     };
