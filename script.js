@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let activeInterval = null;
     let currentMainCharacterImg = 'img/newImage/茶米.png'; 
 
+    let isSubscribed = false;
+
     // 模擬資料庫
     const teaDatabase = [
         // 綠茶類 (Green)
@@ -1023,6 +1025,53 @@ document.addEventListener('DOMContentLoaded', function() {
                     emptyCard.style.visibility = 'hidden';
                     topBadgesContainer.appendChild(emptyCard);
                 }
+            }
+        },
+        //subscribe
+        subscribe: () => {
+            const subTitle = document.getElementById('subTitle');
+            const subDesc = document.getElementById('subDesc');
+            const subBtn = document.getElementById('subActionBtn');
+
+            // 渲染 UI 函式
+            function renderSubscriptionUI() {
+                if (isSubscribed) {
+                    // --- 狀態：已訂閱 ---
+                    subTitle.innerText = '您已成為「專注 V I P」';
+                    // 模擬一個日期
+                    subDesc.innerText = '訂閱期限：2026/12/31';
+                    
+                    subBtn.innerText = '取 消 訂 閱';
+                    subBtn.className = 'sub-btn-cancel'; // 切換為空心樣式
+                } else {
+                    // --- 狀態：未訂閱 ---
+                    subTitle.innerText = '加 入 V I P';
+                    subDesc.innerText = '與茶米一起更有效率學習！';
+                    
+                    subBtn.innerText = '加 入 訂 閱';
+                    subBtn.className = 'sub-btn-join';   // 切換為實心樣式
+                }
+            }
+
+            // 初始化渲染
+            renderSubscriptionUI();
+
+            // 綁定按鈕事件
+            if (subBtn) {
+                subBtn.addEventListener('click', () => {
+                    // 切換狀態
+                    isSubscribed = !isSubscribed;
+                    
+                    // 顯示提示 (可選)
+                    if (isSubscribed) {
+                        alert('感謝訂閱！您已成為 VIP。');
+                    } else {
+                        alert('已取消訂閱。');
+                    }
+
+                    // 重新渲染畫面
+                    renderSubscriptionUI();
+                });
             }
         }
     };

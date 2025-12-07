@@ -1022,3 +1022,117 @@ button { font-family: inherit; }
     mask-image: linear-gradient(to top, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
     -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%);
 }
+
+/* --- 訂閱頁面 (Subscription) --- */
+
+.sub-card-container {
+    width: 100%;
+    height: 100%;
+    padding: 10px 25px 40px 25px; /* 上右下左 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sub-card {
+    width: 100%;
+    height: 100%;
+    background-color: #F2F3F5; /* 淺灰白背景 */
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* 標題區 */
+.sub-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #F4B04B; /* 橘色 */
+    letter-spacing: 2px;
+    margin: 0 0 10px 0;
+}
+
+.sub-desc {
+    font-size: 14px;
+    color: #9E9E9E; /* 灰色 */
+    margin: 0;
+    font-weight: bold;
+}
+
+/* 圖片區 */
+.sub-img-box {
+    flex: 1; /* 佔據中間空間 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.sub-img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+}
+
+/* 列表區 */
+.sub-benefits {
+    text-align: left;
+    padding-left: 20px;
+    margin-bottom: 30px;
+    list-style-type: disc; /* 實心圓點 */
+    color: #C5A582; /* 點點顏色 */
+}
+
+.sub-benefits li {
+    font-size: 13px;
+    color: #8D8D8D; /* 文字灰色 */
+    font-weight: bold;
+    line-height: 1.6;
+    margin-bottom: 5px;
+}
+
+/* 底部價格與按鈕 */
+.sub-footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sub-price {
+    font-size: 13px;
+    color: #8D8D8D;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* 按鈕共用樣式 */
+#subActionBtn {
+    width: 100%;
+    height: 55px;
+    border-radius: 27.5px;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* 狀態1: 加入訂閱 (實心橘) */
+.sub-btn-join {
+    background-color: #F4B04B;
+    color: #FFFFFF;
+    border: none;
+}
+
+/* 狀態2: 取消訂閱 (空心橘框) */
+.sub-btn-cancel {
+    background-color: transparent;
+    color: #C19A6B; /* 較深的橘褐色 */
+    border: 2px solid #F4B04B;
+}
