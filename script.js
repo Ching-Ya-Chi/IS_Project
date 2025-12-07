@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     id: 4, 
                     name: '黃茶高手', 
                     level: 1, 
-                    img: '../img/newImage/clothes_snowmanHat.png',
+                    img: '../img/newImage/clothes_snowman.png',
                     desc: '成功培育黃茶1次', 
                     rate: '0%',
                     isUnlocked: true
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     id: 7, 
                     name: '黑茶專家', 
                     level: 10, 
-                    img: '../img/newImage/clothes_snowman.png',
+                    img: '../img/newImage/clothes_lanternHat.png',
                     desc: '成功培育黑茶20次', 
                     rate: '20%',
                     isUnlocked: false
