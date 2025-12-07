@@ -1,55 +1,56 @@
 <div class="screen">
+    
+    <!-- Header -->
+    <div class="header">
+        <!-- 這裡綁定 data-page="main" 讓返回鍵能正常運作 -->
+        <button class="back-btn" id="costumeBackBtn" data-page="main">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="page-title">
+            裝 扮 <i class="fas fa-tshirt header-icon"></i>
+        </div>
+    </div>
+
+    <!-- 1. 中間大展示區 -->
+    <div class="preview-card">
+        <!-- 預設顯示沒穿衣服的茶米 -->
+        <img src="img/newImage/茶米.png" class="preview-img" id="characterPreviewImg" alt="Character Preview">
+    </div>
+
+    <!-- 2. 下方裝飾物元素 (上下各3個，共6個) -->
+    <div class="items-container">
         
-        <!-- Header -->
-        <div class="header">
-            <button class="back-btn" id="costumeBackBtn">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <div class="page-title">
-                裝 扮 <i class="fas fa-tshirt header-icon"></i>
+        <!-- 第一排 -->
+        <div class="items-row">
+            <div class="item-box" data-id="c1" data-preview="img/newImage/snowman.png">
+                <img src="img/newImage/snowman.png" class="item-img">
+            </div>
+            <div class="item-box" data-id="c2" data-preview="img/newImage/deer.png">
+                <img src="img/newImage/deer.png" class="item-img">
+            </div>
+            <div class="item-box" data-id="a1" data-preview="img/newImage/elf.png">
+                <img src="img/newImage/clothes_elf.png" class="item-img">
             </div>
         </div>
 
-        <!-- 1. 中間大展示區 (預留圖片) -->
-        <div class="preview-card">
-            <!-- 請在此輸入角色預覽圖片路徑 -->
-            <!-- 這裡先放一張透明圖或底圖 -->
-            <img src="img\newImage\茶米.png" class="preview-img" alt="Character Preview">
-        </div>
-
-        <!-- 2. 下方裝飾物元素 (預留圖片) -->
-        <div class="items-container">
-            
-            <!-- 第一排：配件 -->
-            <div class="items-row">
-                <!-- Item 1 -->
-                <div class="item-box" data-id="c1">
-                    <img src="img\newImage\clothes_sunglasses.png" class="item-img">
-                </div>
-                <!-- Item 2 -->
-                <div class="item-box" data-id="c2">
-                    <img src="img\newImage\clothes_hat.png" class="item-img">
-                </div>
+        <div class="items-row">
+            <div class="item-box" data-id="a2" data-preview="img/newImage/santa.png">
+                <img src="img/newImage/clothes_santa.png" class="item-img">
             </div>
-
-            <!-- 第二排：衣服 -->
-            <div class="items-row">
-                <!-- Item 5 -->
-                <div class="item-box" data-id="a1">
-                    <img src="img\newImage\clothes_elf.png" class="item-img">
-                </div>
-                <!-- Item 6 -->
-                <div class="item-box" data-id="a2">
-                    <img src="img\newImage\clothes_santa.png" class="item-img">
-                </div>
+            <div class="item-box" data-id="extra1" data-preview="img/newImage/茶米.png">
+                <!-- 預留圖片 -->
             </div>
-
-        </div>
-
-        <!-- 3. 底部按鈕 (功能保留) -->
-        <div class="footer-btns">
-            <button class="action-btn" id="btnWear">穿 戴</button>
-            <button class="action-btn" id="btnUnwear">卸 下</button>
+            <div class="item-box" data-id="extra2" data-preview="img/newImage/茶米.png">
+                <!-- 預留圖片 -->
+            </div>
         </div>
 
     </div>
+
+    <!-- 3. 底部按鈕 -->
+    <div class="footer-btns">
+        <button class="action-btn" id="btnWear">穿 戴</button>
+        <button class="action-btn" id="btnUnwear">卸 下</button>
+    </div>
+
+</div>

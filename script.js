@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const pageCache = {}; 
     const pageHistory = []; 
     let activeInterval = null;
-    
+    let currentMainCharacterImg = 'img/newImage/茶米.png'; 
+
     // 模擬資料庫
     const teaDatabase = [
         // 綠茶類 (Green)
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     name: '紅茶專家', 
                     level: 9, 
                     img: '../img/newImage/clothes_hat.png',
-                    desc: '連續專注 3 hr', 
+                    desc: '成功培育紅茶20次', 
                     rate: '1%',
                     isUnlocked: true
                 },
@@ -113,7 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     name: '品茶高手', 
                     level: 4, 
                     img: '../img/newImage/clothes_sunglasses.png',
-                    desc: '連續專注 1 hr', 
+                    desc: '成功培育不同茶種5次', 
                     rate: '20%',
                     isUnlocked: true
                 },
@@ -122,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     name: '青茶高手', 
                     level: 4, 
                     img: '../img/newImage/clothes_elf.png',
-                    desc: '連續專注 1 hr', 
+                    desc: '成功培育青茶6次', 
                     rate: '20%',
                     isUnlocked: true
                 },
@@ -131,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     name: '黃茶高手', 
                     level: 1, 
                     img: '../img/newImage/clothes_snowmanHat.png',
-                    desc: '連續專注 0.5 hr', 
+                    desc: '成功培育黃茶1次', 
                     rate: '0%',
                     isUnlocked: true
                 },
@@ -140,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     name: '綠茶高手', 
                     level: 1, 
                     img: '../img/newImage/clothes_snowmanHat.png',
-                    desc: '連續專注 1 hr', 
+                    desc: '成功培育綠茶1次', 
                     rate: '20%',
                     isUnlocked: true
                 },
@@ -149,62 +150,62 @@ document.addEventListener('DOMContentLoaded', function() {
                     name: '烘茶高手', 
                     level: 1, 
                     img: '../img/newImage/clothes_santa.png',
-                    desc: '連續專注 1 hr', 
+                    desc: '連續專注 3 hr 20次', 
                     rate: '20%',
                     isUnlocked: true
                 },
                 { 
                     id: 7, 
-                    name: '綠茶高手', 
+                    name: '黑茶專家', 
                     level: 10, 
                     img: '../img/newImage/clothes_snowman.png',
-                    desc: '連續專注 1 hr', 
+                    desc: '成功培育黑茶20次', 
                     rate: '20%',
                     isUnlocked: false
                 },
                 { 
                     id: 8, 
-                    name: '綠茶高手', 
+                    name: '有點好動', 
                     level: 1, 
                     img: '../img/newImage/clothes_deer.png',
-                    desc: '連續專注 1 hr', 
+                    desc: '打斷專注3次', 
                     rate: '20%',
                     isUnlocked: false
                 },
                 { 
                     id: 9, 
-                    name: '綠茶高手', 
+                    name: '白茶高手', 
                     level: 1, 
                     img: '../img/newImage/clothes_dragon.png',
-                    desc: '連續專注 1 hr', 
+                    desc: '成功培育白茶1次', 
                     rate: '20%',
                     isUnlocked: false
                 },
                 { 
                     id: 10, 
-                    name: '綠茶高手', 
+                    name: '無法專心', 
                     level: 1, 
                     img: '../img/newImage/clothes_gold.png',
-                    desc: '連續專注 1 hr', 
-                    rate: '20%',
+                    desc: '中斷專注10次', 
+                    rate: '0%',
                     isUnlocked: false
                 },
                 { 
                     id: 11, 
-                    name: '綠茶高手', 
+                    name: '文山包種人', 
                     level: 1, 
                     img: '../img/newImage/clothes_goldhHat.png',
-                    desc: '連續專注 1 hr', 
-                    rate: '20%',
+                    desc: '成功培育文山包種茶10次', 
+                    rate: '0%',
                     isUnlocked: false
                 },
                 { 
                     id: 12, 
-                    name: '綠茶高手', 
+                    name: '茶當水喝', 
                     level: 1, 
                     img: '../img/newImage/clothes_lantern.png',
-                    desc: '連續專注 1 hr', 
-                    rate: '20%',
+                    desc: '連續專注 3hr 100次', 
+                    rate: '0%',
                     isUnlocked: false
                 }
             ];
@@ -292,6 +293,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const charBtn = document.getElementById('mainCharacterBtn');
         const bubble = document.getElementById('charSpeechBubble');
         let bubbleTimer = null; // 用來儲存計時器，避免快速點擊時閃爍
+
+        if (charBtn) {
+            charBtn.src = currentMainCharacterImg;
+        }    
 
         const dialogueList = [
             "「製茶需要耐心，專注也是。我們一起加油！」",
@@ -763,12 +768,55 @@ document.addEventListener('DOMContentLoaded', function() {
 
         costume: () => {
             const items = document.querySelectorAll('.item-box');
+            const previewImg = document.getElementById('characterPreviewImg');
+            const btnWear = document.getElementById('btnWear');
+            const btnUnwear = document.getElementById('btnUnwear');
+
+            // 1. 點擊道具：切換「預覽圖」 (視覺效果)
             items.forEach(item => {
                 item.addEventListener('click', () => {
+                    // 移除其他選取狀態
                     items.forEach(b => b.classList.remove('selected'));
                     item.classList.add('selected');
+
+                    // 取得該格子的預覽圖路徑
+                    const previewSrc = item.getAttribute('data-preview');
+                    
+                    // 如果有設定路徑，就更新中間的大圖
+                    if (previewSrc && previewImg) {
+                        previewImg.src = previewSrc;
+                    }
                 });
             });
+
+            // 2. 點擊「穿戴」 (固定邏輯：換成聖誕老人並回主頁)
+            if (btnWear) {
+                btnWear.addEventListener('click', () => {
+                    
+                    const selectedItem = document.querySelector('.item-box.selected');
+                    if (!selectedItem) {
+                        alert('請先選擇一個道具來穿戴！');
+                        return;
+                    }
+                    currentMainCharacterImg = selectedItem.getAttribute('data-preview'); 
+                    
+                    // 跳轉回主頁
+                    loadPage('main');
+                });
+            }
+
+            // 3. 點擊「卸下」 (固定邏輯：換回預設茶米並回主頁)
+            if (btnUnwear) {
+                btnUnwear.addEventListener('click', () => {
+                    console.log("執行卸下：回復預設");
+                    
+                    // ★ 設定全域變數為預設圖片
+                    currentMainCharacterImg = 'img/newImage/茶米.png';
+                    
+                    // 跳轉回主頁
+                    loadPage('main');
+                });
+            }
         },
 
         // 7. 成就

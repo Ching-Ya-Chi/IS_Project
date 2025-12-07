@@ -688,6 +688,81 @@ button { font-family: inherit; }
 .logout-section { margin-bottom: 150px; }
 
 /* 裝扮 */
+
+.preview-card {
+            width: 100%; height: 320px;
+            background-color: #F4B04B; /* 橘色背景 */
+            border-radius: 30px;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            overflow: hidden; /* 確保圖片不溢出圓角 */
+        }
+
+        .preview-img {
+            width: 100%; height: 100%;
+            object-fit: cover; /* 或 contain，視您的圖片而定 */
+        }
+
+        /* --- 裝飾物選單區 (Items Container) --- */
+        .items-container {
+            width: 100%;
+            display: flex; flex-direction: column; gap: 15px;
+            margin-bottom: auto; /* 推開底部按鈕 */
+        }
+
+        .items-row {
+    width: 100%; 
+    height: 100px; 
+    background-color: #F4B04B; 
+    border-radius: 20px; 
+    display: flex; 
+    /* 修改：改成 space-evenly 或 space-around 讓3個平均分佈 */
+    justify-content: space-evenly; 
+    align-items: center; 
+    margin-bottom: 15px; /* 增加一點排與排的間距 */
+}
+
+        /* 單個物品格子 */
+        .item-box {
+            width: 60px; 
+    height: 60px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    border: 3px solid transparent; /* 預留邊框空間 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+        }
+
+        /* 物品圖片 */
+        .item-img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            /* 防止點擊圖片時觸發拖曳 */
+            pointer-events: none; 
+        }
+
+        /* --- 被選取狀態 (Selected State) --- */
+        .item-box.selected {
+            background-color: rgba(255, 255, 255, 0.4); /* 半透明白底 */
+            border-color: #FFF; /* 白色邊框 */
+            transform: scale(1.05); /* 稍微放大 */
+        }
+
+        .preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 確保全身圖完整顯示不被切掉 */
+}
+/* --- 底部按鈕區 --- */
+        .footer-btns {
+            width: 100%;
+            display: flex; justify-content: space-between;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+
 .summary-section { 
     display: flex; 
     gap: 25px; 
@@ -706,8 +781,6 @@ button { font-family: inherit; }
     background: #fff; 
     border-radius: 50%; 
     margin-bottom: 15px; 
-    
-    /* ★★★ 關鍵修正 ★★★ */
     overflow: hidden; /* 強制切除超出圓圈的部分 */
     display: flex;    /* 讓圖片水平垂直置中 */
     justify-content: center;
