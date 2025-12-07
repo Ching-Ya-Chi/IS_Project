@@ -376,7 +376,7 @@ button { font-family: inherit; }
 /* 對話氣泡框 */
 .speech-bubble {
     position: absolute;
-    bottom: 90%; /* 位於角色上方 */
+    bottom: 80%; /* 位於角色上方 */
     left: 50%;
     transform: translateX(-50%); /* 水平置中 */
     
@@ -390,7 +390,7 @@ button { font-family: inherit; }
     font-weight: bold;
     text-align: center;
     line-height: 1.4;
-    min-width: 200px;
+    min-width: 220px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     
     /* 動畫效果 */
@@ -398,7 +398,7 @@ button { font-family: inherit; }
     visibility: hidden;
     transition: opacity 0.3s, transform 0.3s;
     pointer-events: none; /* 避免氣泡擋住點擊 */
-    z-index: 10;
+    z-index: 20;
 }
 
 /* 氣泡顯示狀態 */
@@ -657,6 +657,14 @@ button { font-family: inherit; }
    9. 專注頁與結果 (Focus)
    ========================================= */
 .timer-section { margin-top: 30px; width: 260px; height: 260px; background: rgba(220, 210, 180, 0.4); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5; }
+.timer-val { 
+    font-size: 42px; /* 原本 56px 改小 */
+    color: #C19A6B; 
+    font-weight: bold; 
+    white-space: nowrap; /* 不換行 */
+    letter-spacing: 1px;
+}
+
 .main-visual { flex: 1; width: 100%; display: flex; justify-content: center; align-items: flex-end; position: relative; overflow: hidden; }
 .main-visual video, .main-visual img { width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to top, black 80%, transparent 100%); -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%); }
 .checklist-box { position: absolute; top: 20px; right: 20px; width: 140px; background: rgba(220, 215, 182, 0.9); padding: 15px; border-radius: 15px; z-index: 10; }

@@ -393,19 +393,66 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 4. 專注頁 (Focus)
         focus: (settings) => {
-            console.log("進入專注頁，參數:", settings);
-            const sessionData = settings || { totalSeconds: 4800, checklist: ['預設事項'] };
-            const timerHrEl = document.getElementById('timerHr');
-            const timerMinEl = document.getElementById('timerMin');
+            console.log("進入專注頁，設定:", settings);
+            const sessionData = settings || { totalSeconds: 4800, checklist: ['專注目標'] };
+            
+            // DOM 元素
+            const timerDisplay = document.getElementById('timerDisplay');
+            const focusVideo = document.getElementById('focusVideo');
+            const speechBubble = document.getElementById('focusSpeechBubble');
             const abortModal = document.getElementById('abortModal');
             const checklistBox = document.querySelector('.checklist-box');
-            
-            // 渲染清單
+
+            // 1. 設定影片路徑 (依照階段 1~4)
+            const videoSources = [
+                '../img/newImage/sunbathe.mp4',   // 階段 1: 剛開始 (0% - 25%)
+                '../img/newImage/roasting2.mp4',  // 階段 2: 進行中 (25% - 50%)
+                '../img/newImage/roasting3.mp4',  // 階段 3: 深化 (50% - 75%)
+                '../img/newImage/rub.mp4'         // 階段 4: 最後衝刺 (75% - 100%)
+            ];
+
+            // 2. 設定對話文本
+            // 注意：[使用者設定的目標] 會在顯示時被替換
+            const dialogues = [
+                // 第一階段
+                [
+                    "「剛開始專注，還滿辛苦的呢！跟這個炎熱的太陽一樣~」",
+                    "「趕快進入狀況吧！完成你的『[使用者設定的目標]』，我已經快要被曬乾囉！」"
+                ],
+                // 第二階段
+                [
+                    "「呼～茶葉正在慢慢轉化，你也專注地努力著呢！」",
+                    "「製茶需要耐心，專注完成『[使用者設定的目標]』也是。我們一起加油！」"
+                ],
+                // 第三階段
+                [
+                    "「咦？怎麼了？是不是有什麼重要的事情需要處理呀？」",
+                    "「別忘了，茶葉還在烘焙呢。要不要再回到專注中來？」",
+                    "「你的『[使用者設定的目標]』還在等著我們呢！」"
+                ],
+                // 第四階段
+                [
+                    "「欸，你是不是有點分心了呀？小心茶葉要焦掉囉！」",
+                    "「我們約好了要一起完成『[使用者設定的目標]』的，還記得嗎？」",
+                    "「哇！你還在考慮嗎？那些茶種可是我們一起努力的成果呢！就差最後一步了，堅持住～」"
+                ]
+            ];
+
+            // 取得使用者設定的第一個目標，若無則用預設文字
+            const userGoal = (sessionData.checklist && sessionData.checklist.length > 0) 
+                             ? sessionData.checklist[0] 
+                             : "專注任務";
+
+            // 狀態變數
+            let currentSeconds = sessionData.totalSeconds;
+            let currentPhase = -1; // 追蹤目前階段，避免重複切換影片
+            let bubbleTimer = null;
+
+            // 3. 渲染清單 (右上角)
             if (checklistBox) {
                 const title = checklistBox.querySelector('.checklist-title');
                 checklistBox.innerHTML = ''; 
                 if(title) checklistBox.appendChild(title);
-
                 sessionData.checklist.forEach(item => {
                     const div = document.createElement('div');
                     div.className = 'checklist-item';
@@ -413,26 +460,82 @@ document.addEventListener('DOMContentLoaded', function() {
                     checklistBox.appendChild(div);
                 });
             }
-            
-            let currentSeconds = sessionData.totalSeconds;
 
-            function updateDisplay() {
+            // 4. 更新時間顯示與影片階段
+            function updateState() {
+                // A. 更新時間 (HH : MM : SS)
                 const hr = Math.floor(currentSeconds / 3600);
                 const min = Math.floor((currentSeconds % 3600) / 60);
-                if(timerHrEl) timerHrEl.innerText = hr;
-                if(timerMinEl) timerMinEl.innerText = min;
+                const sec = currentSeconds % 60;
+                
+                // 補零函式
+                const pad = (num) => num.toString().padStart(2, '0');
+                
+                if(timerDisplay) {
+                    timerDisplay.innerText = `${pad(hr)} : ${pad(min)} : ${pad(sec)}`;
+                }
+
+                // B. 計算階段 (0 ~ 3)
+                // 進度 = (總時間 - 剩餘) / 總時間
+                const elapsed = sessionData.totalSeconds - currentSeconds;
+                let progress = elapsed / sessionData.totalSeconds;
+                
+                // 確保 progress 不會超過 1 (最後一秒)
+                if (progress >= 1) progress = 0.99;
+
+                // 0~0.24=0, 0.25~0.49=1, 0.5~0.74=2, 0.75~0.99=3
+                const newPhase = Math.floor(progress * 4);
+
+                // C. 如果階段改變，切換影片
+                if (newPhase !== currentPhase) {
+                    currentPhase = newPhase;
+                    console.log(`進入第 ${currentPhase + 1} 階段，播放: ${videoSources[currentPhase]}`);
+                    
+                    if(focusVideo) {
+                        focusVideo.src = videoSources[currentPhase];
+                        focusVideo.play().catch(e => console.log("影片播放失敗:", e));
+                    }
+                }
             }
 
-            updateDisplay();
+            // 5. 綁定影片點擊互動 (對話氣泡)
+            if (focusVideo && speechBubble) {
+                focusVideo.addEventListener('click', () => {
+                    // 根據目前階段 (currentPhase) 取得對應文本陣列
+                    const phaseTexts = dialogues[currentPhase] || dialogues[0];
+                    
+                    // 隨機抽取一句
+                    const randomIdx = Math.floor(Math.random() * phaseTexts.length);
+                    let text = phaseTexts[randomIdx];
+
+                    // 替換目標文字
+                    text = text.replace(/\[使用者設定的目標\]/g, userGoal);
+
+                    // 顯示氣泡
+                    speechBubble.innerText = text;
+                    speechBubble.classList.add('show');
+
+                    // 重置計時器
+                    if (bubbleTimer) clearTimeout(bubbleTimer);
+                    bubbleTimer = setTimeout(() => {
+                        speechBubble.classList.remove('show');
+                    }, 3000); // 3秒後消失
+                });
+            }
+
+            // 初始化一次
+            updateState();
+
+            // 6. 啟動計時器
             activeInterval = setInterval(() => {
                 if (currentSeconds > 0) {
                     currentSeconds--;
-                    updateDisplay();
+                    updateState(); // 更新時間與檢查階段
                 } else {
                     clearInterval(activeInterval);
                     finishSession(true);
                 }
-            }, 1000); // 測試時可改為 100 加速
+            }, 1000); // 測試時可設為 100 加速
 
             function finishSession(isSuccess) {
                 const resultData = {
@@ -444,6 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadPage('focus_result', true, resultData);
             }
 
+            // 按鈕事件綁定
             if(document.getElementById('focusBackBtn')) {
                 document.getElementById('focusBackBtn').addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -642,7 +746,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (session.success) {
-                if(resultMessageEl) resultMessageEl.innerHTML = `你已成功專注 ${timeStr} ！<br>恭喜獲得「綠茶」`;
+                if(resultMessageEl) resultMessageEl.innerHTML = `你已成功專注 ${timeStr} ！<br>恭喜獲得「玉露」`;
                 if(resultFailImage) resultFailImage.style.display = 'none';
                 if(resultSuccessImage) {
                     resultSuccessImage.style.display = 'block';
