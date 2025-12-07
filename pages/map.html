@@ -10,7 +10,7 @@
 
     <!-- 右上角使用者頭像 -->
     <div class="map-avatar-wrapper">
-        <div class="user-avatar">
+        <div class="user-avatar" id="mapUserAvatarBtn">
             <img src="https://placehold.co/100x100/4CAF50/white?text=User" alt="User">
         </div>
     </div>
@@ -80,6 +80,59 @@
             </div>
             <button class="enter-btn" id = 'enterGardenBtn'>進 入 茶 園</button>
         </div>
+    </div>
+        <!-- === [新增] 使用者資訊 Modal === -->
+    <div class="modal-overlay" id="userProfileModal">
+        <div class="user-profile-card">
+            
+            <!-- 1. 頭像與名稱 -->
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <img src="https://placehold.co/100x100/4CAF50/white?text=User" alt="User">
+                </div>
+                <div class="profile-name">user name</div>
+            </div>
+
+            <!-- 2. 數據進度條 -->
+            <div class="profile-stats">
+                <!-- 茶種 -->
+                <div class="stat-row">
+                    <span class="stat-label">茶 種</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-text" id="statTeaText">0/0</div>
+                        <div class="stat-bar-fill" id="statTeaBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <!-- 成就 -->
+                <div class="stat-row">
+                    <span class="stat-label">成 就</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-text" id="statAchieveText">0/0</div>
+                        <div class="stat-bar-fill" id="statAchieveBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <!-- 裝扮 (目前無資料，先寫死或隨機) -->
+                <div class="stat-row">
+                    <span class="stat-label">裝 扮</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-text">10/100</div>
+                        <div class="stat-bar-fill" style="width: 10%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 選單連結 -->
+            <div class="profile-menu">
+                <div class="profile-menu-item" data-page="tea_cabinet">茶 櫃</div>
+                <div class="profile-menu-item" data-page="costume">裝 扮</div>
+                <!-- 注意：這裡直接跳轉成就頁面 -->
+                <div class="profile-menu-item" data-page="achievements" data-arg="unlocked">成 就</div>
+                <div class="profile-menu-item" data-page="subscribe">訂 閱</div>
+                <div class="profile-menu-item" data-page="setting">設 定</div>
+            </div>
+
+        </div>
+    
     </div>
 
 </div>

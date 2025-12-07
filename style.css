@@ -1136,3 +1136,126 @@ button { font-family: inherit; }
     color: #C19A6B; /* 較深的橘褐色 */
     border: 2px solid #F4B04B;
 }
+
+/* --- 使用者資訊 Modal (User Profile in Map) --- */
+
+/* 卡片本體 */
+.user-profile-card {
+    width: 320px;
+    background-color: #F5F5F0; /* 米灰色背景 */
+    border-radius: 30px;
+    padding: 30px 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* 1. 頭像與名稱區 */
+.profile-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 25px;
+    padding-left: 10px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #8BC34A;
+    border: 3px solid #fff;
+    margin-right: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.profile-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+
+.profile-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #F4B04B; /* 橘色文字 */
+    letter-spacing: 1px;
+}
+
+/* 2. 進度條區 */
+.profile-stats {
+    width: 100%;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #8B5E3C; /* 深褐色 */
+    width: 50px;
+}
+
+.stat-bar-container {
+    flex: 1;
+    height: 12px;
+    background-color: #D3D3D3; /* 灰色底條 */
+    border-radius: 6px;
+    position: relative;
+    margin-left: 10px;
+    overflow: hidden;
+}
+
+/* 進度條填色 (可選，截圖似乎是純灰底白字，這裡我加一點淡色區分) */
+.stat-bar-fill {
+    height: 100%;
+    background-color: #C5A582; /* 淺褐色進度 */
+    border-radius: 6px;
+}
+
+/* 數字文字 (浮在進度條上方) */
+.stat-bar-text {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    color: #555; /* 深色字比較清楚 */
+    font-weight: bold;
+    z-index: 2;
+    top: -1px; /* 微調垂直位置 */
+}
+
+/* 3. 選單連結區 */
+.profile-menu {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-menu-item {
+    font-size: 22px;
+    font-weight: bold;
+    color: #C19A6B; /* 淺棕色文字 */
+    cursor: pointer;
+    letter-spacing: 4px;
+    transition: transform 0.1s, color 0.2s;
+}
+
+.profile-menu-item:hover {
+    color: #F4B04B;
+    transform: scale(1.05);
+}

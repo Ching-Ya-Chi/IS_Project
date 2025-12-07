@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentMainCharacterImg = 'img/newImage/茶米.png'; 
 
     let isSubscribed = false;
+    let globalTotalFocusSeconds = 0;
 
     // 模擬資料庫
     const teaDatabase = [
@@ -291,40 +292,46 @@ document.addEventListener('DOMContentLoaded', function() {
         modify_acc: () => {},
         /*main*/ 
         main: () => {
-        // --- 角色對話邏輯 ---
-        const charBtn = document.getElementById('mainCharacterBtn');
-        const bubble = document.getElementById('charSpeechBubble');
-        let bubbleTimer = null; // 用來儲存計時器，避免快速點擊時閃爍
+            // --- A. 更新今日專注時間 (新增功能) ---
+            const timeDisplay = document.getElementById('totalFocusTimeDisplay');
+            if (timeDisplay) {
+                const hr = Math.floor(globalTotalFocusSeconds / 3600);
+                const min = Math.floor((globalTotalFocusSeconds % 3600) / 60);
+                const sec = globalTotalFocusSeconds % 60;
 
-        if (charBtn) {
-            charBtn.src = currentMainCharacterImg;
-        }    
+                // 補零函式
+                const pad = (num) => num.toString().padStart(2, '0');
+                timeDisplay.innerText = `${pad(hr)} : ${pad(min)} : ${pad(sec)}`;
+            }
 
-        const dialogueList = [
-            "「製茶需要耐心，專注也是。我們一起加油！」",
-            "「茶香逐漸飄散，你的目標也越來越近了！」",
-            "「今天也要趕快一起跟茶米繼續保持專注唷！」"
-        ];
+            // --- B. 角色與對話邏輯 (保留原本功能) ---
+            const charBtn = document.getElementById('mainCharacterBtn');
+            const bubble = document.getElementById('charSpeechBubble');
+            let bubbleTimer = null;
 
-        if (charBtn && bubble) {
-            charBtn.addEventListener('click', () => {
-                // 1. 隨機抽取一句話
-                const randomIndex = Math.floor(Math.random() * dialogueList.length);
-                bubble.innerText = dialogueList[randomIndex];
+            // 讀取全域變數設定圖片 (裝扮功能)
+            if (charBtn && typeof currentMainCharacterImg !== 'undefined') {
+                charBtn.src = currentMainCharacterImg;
+            }
 
-                // 2. 顯示氣泡
-                bubble.classList.add('show');
+            const dialogueList = [
+                "「製茶需要耐心，專注也是。我們一起加油！」",
+                "「茶香逐漸飄散，你的目標也越來越近了！」",
+                "「今天也要趕快一起跟茶米繼續保持專注唷！」"
+            ];
 
-                // 3. 重置計時器 (如果還沒消失又被點了一次，要重新倒數)
-                if (bubbleTimer) clearTimeout(bubbleTimer);
-
-                // 4. 設定 3 秒後消失
-                bubbleTimer = setTimeout(() => {
-                    bubble.classList.remove('show');
-                }, 3000);
-            });
-        }
-    },
+            if (charBtn && bubble) {
+                charBtn.addEventListener('click', () => {
+                    const randomIndex = Math.floor(Math.random() * dialogueList.length);
+                    bubble.innerText = dialogueList[randomIndex];
+                    bubble.classList.add('show');
+                    if (bubbleTimer) clearTimeout(bubbleTimer);
+                    bubbleTimer = setTimeout(() => {
+                        bubble.classList.remove('show');
+                    }, 3000);
+                });
+            }
+        },
 
         // ★★★ 地圖頁 (重點修正) ★★★
         map: () => {
@@ -336,7 +343,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const displayMin = document.getElementById('displayMin');
             const modalTitle = document.getElementById('modalTitle');
             const teaContainer = document.querySelector('.tea-dots-container');
-            
+            const avatarBtn = document.getElementById('mapUserAvatarBtn');
+            const userModal = document.getElementById('userProfileModal');
+            const statTeaText = document.getElementById('statTeaText');
+            const statTeaBar = document.getElementById('statTeaBar');
+            const statAchieveText = document.getElementById('statAchieveText');
+            const statAchieveBar = document.getElementById('statAchieveBar');
             // 2. 定義狀態變數 (放在這裡，讓內部函式都能讀取)
             let currentGardenId = 'A'; // 預設 A 茶園
             let currentMins = 80;      // 預設 80 分鐘 (對應黃茶)
@@ -463,6 +475,39 @@ document.addEventListener('DOMContentLoaded', function() {
             if(modal) {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) modal.classList.remove('active');
+                });
+            }
+
+            // ★★★ [新增] 使用者頭像點擊邏輯 ★★★
+            if (avatarBtn && userModal) {
+                avatarBtn.addEventListener('click', () => {
+                    // 1. 計算茶種進度 (使用全域 teaDatabase)
+                    const totalTea = teaDatabase.length;
+                    const ownedTea = teaDatabase.filter(t => t.owned).length;
+                    const teaPercent = (ownedTea / totalTea) * 100;
+
+                    // 2. 計算成就進度 (使用全域 globalAchievements)
+                    const totalAchieve = globalAchievements.length;
+                    const unlockedAchieve = globalAchievements.filter(a => a.isUnlocked).length;
+                    const achievePercent = (unlockedAchieve / totalAchieve) * 100;
+
+                    // 3. 更新 UI
+                    if(statTeaText) statTeaText.innerText = `${ownedTea}/${totalTea}`;
+                    if(statTeaBar) statTeaBar.style.width = `${teaPercent}%`;
+
+                    if(statAchieveText) statAchieveText.innerText = `${unlockedAchieve}/${totalAchieve}`;
+                    if(statAchieveBar) statAchieveBar.style.width = `${achievePercent}%`;
+
+                    // 4. 顯示視窗
+                    userModal.classList.add('active');
+                });
+
+                // 點擊遮罩關閉使用者視窗
+                userModal.addEventListener('click', (e) => {
+                    // 確保只點到遮罩才關閉，不要點到內容也關閉
+                    if (e.target === userModal) {
+                        userModal.classList.remove('active');
+                    }
                 });
             }
 
@@ -936,16 +981,20 @@ document.addEventListener('DOMContentLoaded', function() {
         // 8. 結果頁
         focus_result: (data) => {
             const session = data || { success: false, totalTime: 4800, remainingTime: 2400, checklist: ['無待辦事項'] };
+            
             const resultMessageEl = document.getElementById('resultMessage');
-            const checklistContainer = document.getElementById('resultChecklistItems');
-            const resultSuccessImage = document.getElementById('resultSuccessVideo');
+            // ★ 修改 1: 正確抓取 HTML 中定義的 ID
+            const resultSuccessImage = document.getElementById('resultSuccessImage');
             const resultFailImage = document.getElementById('resultFailImage');
+            const checklistContainer = document.getElementById('resultChecklistItems');
 
+            // 計算本次實際專注時間
             const actualSeconds = session.totalTime - session.remainingTime;
             const hr = Math.floor(actualSeconds / 3600);
             const min = Math.floor((actualSeconds % 3600) / 60);
             const timeStr = `${hr} hrs ${min} mins`;
 
+            // 渲染清單
             if(checklistContainer) {
                 checklistContainer.innerHTML = '';
                 session.checklist.forEach(item => {
@@ -957,19 +1006,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (session.success) {
+                // --- 成功狀態 ---
+                // 累加時間
+                if (typeof globalTotalFocusSeconds !== 'undefined') {
+                    globalTotalFocusSeconds += actualSeconds;
+                    console.log(`累計時間更新: ${globalTotalFocusSeconds} 秒`);
+                }
+
                 if(resultMessageEl) resultMessageEl.innerHTML = `你已成功專注 ${timeStr} ！<br>恭喜獲得「玉露」`;
-                if(resultFailImage) resultFailImage.style.display = 'none';
-                if(resultSuccessImage) {
-                    resultSuccessImage.style.display = 'block';
-                    resultSuccessImage.play().catch(e => console.log("影片播放失敗", e));
-                }
+                
+                // ★ 修改 2: 控制圖片顯示與隱藏 (移除 video 邏輯)
+                if(resultSuccessImage) resultSuccessImage.style.display = 'block'; // 顯示成功圖
+                if(resultFailImage) resultFailImage.style.display = 'none';      // 隱藏失敗圖
+
             } else {
+                // --- 失敗/中斷狀態 ---
                 if(resultMessageEl) resultMessageEl.innerHTML = `你專注了 ${timeStr}<br>但失去「文山包種茶」，再接再厲！`;
-                if(resultSuccessImage) {
-                    resultSuccessImage.style.display = 'none';
-                    resultSuccessImage.pause();
-                }
-                if(resultFailImage) resultFailImage.style.display = 'block';
+                
+                // ★ 修改 3: 控制圖片顯示與隱藏
+                if(resultSuccessImage) resultSuccessImage.style.display = 'none'; // 隱藏成功圖
+                if(resultFailImage) resultFailImage.style.display = 'block';      // 顯示失敗圖
             }
         },
         //costume_achievements
