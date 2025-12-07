@@ -27,9 +27,27 @@ document.addEventListener('DOMContentLoaded', function() {
         // 紅茶類 (Red)
         { id: 21, type: 'red', name: '日月台', owned: true }, // 依照表格文字
         { id: 22, type: 'red', name: '阿薩姆', owned: true },
-        { id: 23, type: 'red', name: '蜜香', owned: true }, // 表格寫"蜜香"，可能是蜜香紅茶
+        { id: 23, type: 'red', name: '蜜香', owned: true }, 
         { id: 24, type: 'red', name: '錫蘭', owned: false },
-        { id: 25, type: 'red', name: '日月潭', owned: false }
+        { id: 25, type: 'red', name: '日月潭', owned: false },
+
+        //黃茶
+        { id: 26, type: 'yellow', name: '君山銀針', owned: false }, 
+        { id: 27, type: 'yellow', name: '蒙頂黃芽', owned: false },
+        { id: 28, type: 'yellow', name: '平陽黃湯', owned: false },
+
+        // 白茶
+        { id: 29, type: 'white', name: '白毫銀針', owned: false }, 
+        { id: 30, type: 'white', name: '白牡丹', owned: false },
+        { id: 31, type: 'white', name: '壽眉', owned: false },
+        { id: 32, type: 'white', name: '福鼎大白', owned: false }, 
+        { id: 33, type: 'white', name: '月光白', owned: false },
+        { id: 34, type: 'white', name: '珍珠白', owned: false },
+
+        // 黑茶
+        { id: 35, type: 'black', name: '普洱茶', owned: false },
+        { id: 36, type: 'black', name: '金花茯磚', owned: false },
+        { id: 37, type: 'black', name: '六堡茶', owned: false }  
     ];
 
     // --- 2. 圖片路徑對應表 (集中管理圖片) ---
