@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { id: 5, type: 'green', name: '煎茶', owned: false },
         
         //青茶/烏龍類 (Oolong - 根據您的表格歸類於中間時長)
-        { id: 11, type: 'oolong', name: '文山包種茶', owned: true },
+        { id: 11, type: 'oolong', name: '文山包種茶', owned: false },
         { id: 12, type: 'oolong', name: '岩茶', owned: false },
         { id: 13, type: 'oolong', name: '東方美人', owned: false },
         { id: 14, type: 'oolong', name: '高山茶', owned: true },
@@ -767,7 +767,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 或者在這裡做 mapping:
                 
                 let dbType = type;
-                if (type === 'black') dbType = 'red'; // 對應紅色/紅茶按鈕
+
 
                 const filtered = teaDatabase.filter(t => t.type === dbType);
                 const owned = filtered.filter(t => t.owned).length;
@@ -819,6 +819,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const btnWear = document.getElementById('btnWear');
             const btnUnwear = document.getElementById('btnUnwear');
 
+            if (previewImg && typeof currentMainCharacterImg !== 'undefined') {
+                previewImg.src = currentMainCharacterImg;
+            }
+
             // 1. 點擊道具：切換「預覽圖」 (視覺效果)
             items.forEach(item => {
                 item.addEventListener('click', () => {
@@ -846,7 +850,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                     currentMainCharacterImg = selectedItem.getAttribute('data-preview'); 
-                    
+                    previewImg.src = currentMainCharacterImg;
                     // 跳轉回主頁
                     loadPage('main');
                 });
