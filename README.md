@@ -62,7 +62,7 @@ This project was brought to life through the collaborative efforts of the follow
 *   Lead artist responsible for creating all original visual assets, including tea illustrations, map backgrounds, and UI icons.
 *   Designed and produced animations for the "Tea Mi" character and focus states to enhance user engagement.
 
-### **yhc28**
+### **yhc28** **and two contributers**
 **Role: UI/UX Design**
 *   Designed the user interface layout and visual hierarchy.
 *   Handled CSS styling and aesthetic refinement to ensure a cohesive, visually appealing, and user-friendly experience across the application.
